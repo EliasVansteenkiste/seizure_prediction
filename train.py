@@ -66,7 +66,7 @@ parser.add_argument('--validation-ratio', dest='chosen_validation_ratio', action
 					help='validation ratio (default 0.2)')
 parser.add_argument('--shift', dest='shift', action='store', type=int, default=0,
 					help='Only at test time! Shift the window around the peak and predict for each shifted sample and add the probabilities. (default 0)')
-parser.add_argument('--no-channels', dest='no_channels', action='store', type=int, default=4,
+parser.add_argument('--no-channels', dest='no_channels', action='store', type=int, default=16,
 					help='The number of channels in the data (default: 4)')
 parser.add_argument('--target_gpu',dest='target_gpu', action='store', default="gpu0",
                    help='target gpu')
@@ -107,8 +107,6 @@ ceil = preprocess_params['ceil']
 fft_width = preprocess_params['fft_width']
 overlap = preprocess_params['overlap']
 magnitude_window = preprocess_params['magnitude_window']
-on_lower_bound = preprocess_params['on_lower_bound']
-on_upper_bound = preprocess_params['on_upper_bound']
 include_userdata = preprocess_params['include_userdata']
 
 height=fft_width/2
@@ -139,7 +137,7 @@ assert ceil <= fft_width / 2
 # 		# print 'r_sat', r_sat
 # 	return np.array([(sat,)], dtype=analysis_data_type)
 
-def read_data(dataset,x_size):
+def read_data(dataset,n_start,n_stop,s_start,s_stop,no_samples_normal_ph,no_samples_seizure_ph):
 	global magnitudes
 	global train_counter
 	global val_counter
@@ -149,18 +147,18 @@ def read_data(dataset,x_size):
 	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
 	print path
 
-	no_normal = int(dataset.no_normal * args.debug_sub_ratio)
-	no_seizure = int(dataset.no_seizure * args.debug_sub_ratio)
-	print "no_normal", no_normal
-	print "no_seizure", no_seizure
+	# no_normal = int(dataset.no_normal * args.debug_sub_ratio)
+	# no_seizure = int(dataset.no_seizure * args.debug_sub_ratio)
+	# print "no_normal", no_normal
+	# print "no_seizure", no_seizure
 
-	print x_size
-	no_samples_normal_ph = x_size/2/no_normal
-	print "no_samples_normal_ph", no_samples_normal_ph	
+	# print x_size
+	# no_samples_normal_ph = x_size/2/no_normal
+	# print "no_samples_normal_ph", no_samples_normal_ph	
 
 	# read in normal 
-	is_train_index = get_train_val_split(no_normal)
-	for i in xrange(no_normal):
+	is_train_index = get_train_val_split(n_stop)
+	for i in xrange(n_start,n_stop):
 		print "i", i
 		data_1h = read_data_1h(path,'_0.mat',i*6+1)
 		no_counted_slices = 0
@@ -174,14 +172,7 @@ def read_data(dataset,x_size):
 			#print "step", step
 			r = np.arange(0,magnitude.shape[0],step)
 			no_counted_slices = len(r)
-			# print "no_counted_slices", no_counted_slices
-			# print "counter", counter
-			# print "counter+no_counted_slices", counter+no_counted_slices
-			# print "magnitudes[counter:counter+no_counted_slices].shape", magnitudes[counter:(counter+no_counted_slices)].shape
-			# print "magnitudes[counter].shape", magnitudes[counter].shape
-			# print "magnitude.shape", magnitude.shape
-			# print "magnitude[r].shape", magnitude[r].shape
-			#magnitudes[counter:counter:no_counted_slices,ch] = magnitude[r:r+64]
+			print("no_counted_slices",no_counted_slices)
 			for j in range(no_counted_slices):
 				if is_train_index[i]:
 					magnitudes[counter+j,ch] = magnitude[r[j]]
@@ -195,12 +186,12 @@ def read_data(dataset,x_size):
 		else:
 			val_counter -= no_counted_slices
 
-	no_samples_seizure_ph = x_size/2/no_seizure
-	print "no_samples_seizure_ph", no_samples_seizure_ph	
+	# no_samples_seizure_ph = x_size/2/no_seizure
+	# print "no_samples_seizure_ph", no_samples_seizure_ph	
 
 	# read in seizure 
-	is_train_index = get_train_val_split(no_seizure)
-	for i in xrange(no_seizure):
+	is_train_index = get_train_val_split(s_stop)
+	for i in xrange(s_start,s_stop):
 		print "i", i
 		data_1h = read_data_1h(path,'_1.mat',i*6+1)
 		no_counted_slices = 0
@@ -213,6 +204,7 @@ def read_data(dataset,x_size):
 			step = 1+magnitude.shape[0]/no_samples_seizure_ph
 			r = np.arange(0,magnitude.shape[0],step)
 			no_counted_slices = len(r)
+			print("no_counted_slices",no_counted_slices)
 			for j in range(no_counted_slices):
 				if is_train_index[i]:
 					magnitudes[counter+j,ch] = magnitude[r[j]]
@@ -227,7 +219,7 @@ def read_data(dataset,x_size):
 
 	print "counter", counter
 	
-	print "Done reading in", no_normal, "no seizure hours and", no_seizure, "seizure hours"
+	print "Done reading in", n_stop-n_start, "no seizure hours and", s_stop-s_start, "seizure hours"
 
 def get_train_val_split(no):
 	if args.fixed_seed:
@@ -326,6 +318,7 @@ def process_taps(raw_magnitudes, raw_labels, raw_analysis_datas, session):
 			userdata[counter][dict_all_users[session.user.lower()]]=1
 
 def preprocess():
+	global size
 	global xTrain
 	global udTrain
 	global yTrain
@@ -340,6 +333,15 @@ def preprocess():
 	global analysis_datas
 
 	print("Loading and preprocessing data...")
+
+
+	multiplier = 16
+	no_normal = int(datasets.patient0.no_normal * args.debug_sub_ratio)
+	no_seizure = int(datasets.patient0.no_seizure * args.debug_sub_ratio)
+	no_samples_normal_ph = multiplier * no_seizure
+	no_samples_seizure_ph = multiplier * no_normal
+
+	size = no_normal * no_samples_normal_ph + no_seizure * no_samples_seizure_ph
 
 	if args.no_training and args.shift > 0:
 		magnitudes = np.zeros((size,args.no_channels,magnitude_window+args.shift-1,ceil-floor), dtype=np.float32)
@@ -369,7 +371,7 @@ def preprocess():
 	 	train_c_before = train_counter
 		val_c_before = val_counter
 		
-		read_data(dataset,size/no_dss)
+		read_data(dataset,0,no_normal,0,no_seizure,no_samples_normal_ph,no_samples_seizure_ph)
 
 		train_c_after = train_counter
 		val_c_after = val_counter
@@ -747,14 +749,7 @@ data_path = args.data_path
 
 
 files_per_hour = 6
-slices_per_hour = 350
 
-multiplier = 16
-size = multiplier 	* int(datasets.patient0.no_normal * args.debug_sub_ratio) \
-					* int(datasets.patient0.no_seizure * args.debug_sub_ratio)
-
-print "int(datasets.patient0.no_normal * args.debug_sub_ratio", int(datasets.patient0.no_normal * args.debug_sub_ratio)
-print "int(datasets.patient0.no_seizure * args.debug_sub_ratio)", int(datasets.patient0.no_seizure * args.debug_sub_ratio)
 
 #is_train_index = get_train_val_split(size)
 
