@@ -21,6 +21,8 @@ def mat_to_pandas(path):
 
 def mat_to_nparray(path):
   mat = sio.loadmat(path)
+  names = mat['dataStruct'].dtype.names
+  # print mat['dataStruct']['sequence']
   return mat['dataStruct']['data'][0, 0]
 
 def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, overlap=265, height=64):
@@ -120,15 +122,46 @@ def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, over
 		# # f.canvas.manager.window.attributes('-topmost', 0)
 		# # plt.show()
 
-analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_0.mat','train_1', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_1.mat','train_1', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/train_2/2_', '_0.mat','train_2', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/train_2/2_', '_1.mat','train_2', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/train_3/3_', '_0.mat','train_3', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/train_3/3_', '_1.mat','train_3', 1, 10)
+def read_data_1h(basename, suffix, start):
+	sample = np.zeros((0,16))
+	for k in range(6):
+		filename = basename+str(start+k)+suffix
+		slice = mat_to_nparray(filename)
+		no_channels = slice.shape[1]
+		sample = np.vstack((sample,slice))
+	return sample
 
-analyze('/home/eavsteen/seizure_detection/data/test_1/1_', '.mat','test_1', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/test_2/2_', '.mat','test_2', 1, 10)
-analyze('/home/eavsteen/seizure_detection/data/test_3/3_', '.mat','test_3', 1, 10)
+def analyze_1h(basename, suffix, savedir, start, end, fft_width=512, overlap=265, height=64):
+	session = 0
+	for i in range(start, end, 6):
+		print "session nr:",session
+		sample = read_data_1h(basename,suffix, i)
+		no_channels = sample.shape[1]
+		for ch in range(no_channels):
+			magnitude = calcFFT(sample[:,ch],fft_width,overlap)[:,:height]
+			fig = plt.figure()
+			plt.imshow(np.flipud(magnitude.transpose()),vmin=20 , vmax=4000, aspect='auto', interpolation='none')
+			fig_filename = 'figures/'+savedir+'/ch'+str(ch)+'/test_1h_'+str(i)+suffix+'.png'
+			print fig_filename
+			fig.savefig(fig_filename)
+		session += 1
+
+
+
+#analyze_1h('/home/eavsteen/seizure_detection/data/train_1/1_', '_0.mat','train_1', 1, 15)
+#analyze_1h('/home/eavsteen/seizure_detection/data/train_1/1_', '_1.mat','train_1', 1, 15)
+
+# analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_0.mat','train_1', 1, 15)
+# analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_1.mat','train_1', 1, 15)
+# analyze('/home/eavsteen/seizure_detection/data/train_2/2_', '_0.mat','train_2', 1, 10)
+# analyze('/home/eavsteen/seizure_detection/data/train_2/2_', '_1.mat','train_2', 1, 10)
+# analyze('/home/eavsteen/seizure_detection/data/train_3/3_', '_0.mat','train_3', 1, 10)
+# analyze('/home/eavsteen/seizure_detection/data/train_3/3_', '_1.mat','train_3', 1, 10)
+
+
+# analyze('/home/eavsteen/seizure_detection/data/test_1/1_', '.mat','test_1', 1, 10)
+# analyze('/home/eavsteen/seizure_detection/data/test_2/2_', '.mat','test_2', 1, 10)
+# analyze('/home/eavsteen/seizure_detection/data/test_3/3_', '.mat','test_3', 1, 10)
 
 	
+		

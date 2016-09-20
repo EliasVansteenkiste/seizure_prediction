@@ -1,0 +1,14 @@
+preprocess:
+    floor: 0 
+    ceil: 128
+    fft_width: 512
+    overlap: 448
+    magnitude_window: 24
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net0
+evaluation:
+    online_training: False
+    model: net0    
