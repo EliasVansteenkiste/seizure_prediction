@@ -334,14 +334,20 @@ def preprocess():
 
 	print("Loading and preprocessing data...")
 
-
 	multiplier = 16
 	no_normal = int(datasets.patient0.no_normal * args.debug_sub_ratio)
 	no_seizure = int(datasets.patient0.no_seizure * args.debug_sub_ratio)
 	no_samples_normal_ph = multiplier * no_seizure
 	no_samples_seizure_ph = multiplier * no_normal
 
+	print "no_normal", no_normal
+	print "no_seizure", no_seizure
+	print "no_samples_normal_ph", no_samples_normal_ph
+	print "no_samples_seizure_ph", no_samples_seizure_ph
+
 	size = no_normal * no_samples_normal_ph + no_seizure * no_samples_seizure_ph
+
+	print "size", size
 
 	if args.no_training and args.shift > 0:
 		magnitudes = np.zeros((size,args.no_channels,magnitude_window+args.shift-1,ceil-floor), dtype=np.float32)

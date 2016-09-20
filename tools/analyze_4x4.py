@@ -23,6 +23,7 @@ def mat_to_nparray(path):
   mat = sio.loadmat(path)
   return mat['dataStruct']['data'][0, 0]
 
+
 def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, overlap=265, height=64):
 	for i in range(start, no_of_samples):
 		filename = basename+str(i)+suffix
@@ -34,6 +35,16 @@ def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, over
 			fig = plt.figure()
 			plt.imshow(np.flipud(magnitude.transpose()),vmin=20 , vmax=4000, aspect='auto', interpolation='none')
 			fig.savefig( 'figures/'+savedir+'/ch'+str(ch)+'/test'+str(i)+suffix+'.png')
+		
+			fig, axs = plt.subplots(2,5, figsize=(15, 6), facecolor='w', edgecolor='k')
+fig.subplots_adjust(hspace = .5, wspace=.001)
+
+axs = axs.ravel()
+
+for i in range(10):
+
+    axs[i].contourf(np.random.rand(10,10),5,cmap=plt.cm.Oranges)
+    axs[i].set_title(str(250+i))
 		# print "m0", np.amin(magnitude0), np.amax(magnitude0), np.mean(magnitude0), np.average(magnitude0)
 		# print "m1", np.amin(magnitude1), np.amax(magnitude1), np.mean(magnitude1), np.average(magnitude1)
 		# print "m2", np.amin(magnitude2), np.amax(magnitude2), np.mean(magnitude2), np.average(magnitude2)
