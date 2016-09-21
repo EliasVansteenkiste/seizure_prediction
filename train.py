@@ -23,7 +23,7 @@ import random
 import platform
 import argparse 
 import gc
-from memory_profiler import profile
+#from memory_profiler import profile
 
 from sklearn.base import clone
 
@@ -68,7 +68,7 @@ parser.add_argument('--shift', dest='shift', action='store', type=int, default=0
 					help='Only at test time! Shift the window around the peak and predict for each shifted sample and add the probabilities. (default 0)')
 parser.add_argument('--no-channels', dest='no_channels', action='store', type=int, default=16,
 					help='The number of channels in the data (default: 4)')
-parser.add_argument('--target_gpu',dest='target_gpu', action='store', default="gpu0",
+parser.add_argument('--target-gpu',dest='target_gpu', action='store', default="gpu0",
                    help='target gpu')
 parser.add_argument('--mode', dest='mode', action='store', default="None",
                    help='single-channel/dual-channel/none (default: none)')
@@ -76,11 +76,9 @@ args = parser.parse_args()
 
 print "Command line arguments:", args
 print "Git reference: ",
-sys.stdout.flush()
 os.system("git show-ref HEAD")
 print "Timestamp:", datetime.datetime.now()
 print "Hostname:", platform.node()
-
 
 import theano.sandbox.cuda
 print args.target_gpu
@@ -101,6 +99,8 @@ with open(args.config_filename, 'r') as ymlfile:
 	ymlfile.seek(0)
 	cfg = yaml.load(ymlfile)
 
+sys.stdout.flush()
+
 preprocess_params = cfg['preprocess']
 floor = preprocess_params['floor']
 ceil = preprocess_params['ceil']
@@ -112,10 +112,6 @@ include_userdata = preprocess_params['include_userdata']
 height=fft_width/2
 assert ceil-floor <= fft_width / 2
 assert ceil <= fft_width / 2
-
-
-
-
 
 # def analyze_record_quality_one_channel(data):
 # 	global c_sat
@@ -156,24 +152,24 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop,no_samples_normal_ph,no_samp
 	# no_samples_normal_ph = x_size/2/no_normal
 	# print "no_samples_normal_ph", no_samples_normal_ph	
 
+
 	# read in normal 
 	is_train_index = get_train_val_split(n_stop)
 	for i in xrange(n_start,n_stop):
 		print "i", i
+		sys.stdout.flush()
 		data_1h = read_data_1h(path,'_0.mat',i*6+1)
-		no_counted_slices = 0
 		if is_train_index[i]:
 			counter = train_counter
 		else:
 			counter = val_counter
 		for ch in range(args.no_channels):
 			magnitude = calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil]
-			step = 1+magnitude.shape[0]/no_samples_normal_ph
-			#print "step", step
+			step = magnitude.shape[0]/no_samples_normal_ph
+			assert no_samples_normal_ph < magnitude.shape[0]
 			r = np.arange(0,magnitude.shape[0],step)
-			no_counted_slices = len(r)
-			print("no_counted_slices",no_counted_slices)
-			for j in range(no_counted_slices):
+			r=r[0:no_samples_normal_ph]
+			for j in range(no_samples_normal_ph):
 				if is_train_index[i]:
 					magnitudes[counter+j,ch] = magnitude[r[j]]
 					labels[counter+j] = 0
@@ -182,9 +178,9 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop,no_samples_normal_ph,no_samp
 					labels[counter-j] = 0
 				
 		if is_train_index[i]:
-			train_counter += no_counted_slices
+			train_counter += no_samples_normal_ph
 		else:
-			val_counter -= no_counted_slices
+			val_counter -= no_samples_normal_ph
 
 	# no_samples_seizure_ph = x_size/2/no_seizure
 	# print "no_samples_seizure_ph", no_samples_seizure_ph	
@@ -193,19 +189,19 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop,no_samples_normal_ph,no_samp
 	is_train_index = get_train_val_split(s_stop)
 	for i in xrange(s_start,s_stop):
 		print "i", i
+		sys.stdout.flush()
 		data_1h = read_data_1h(path,'_1.mat',i*6+1)
-		no_counted_slices = 0
 		if is_train_index[i]:
 			counter = train_counter
 		else:
 			counter = val_counter
 		for ch in range(args.no_channels):
 			magnitude = calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil]
-			step = 1+magnitude.shape[0]/no_samples_seizure_ph
+			step = magnitude.shape[0]/no_samples_seizure_ph
+			assert no_samples_seizure_ph < magnitude.shape[0]
 			r = np.arange(0,magnitude.shape[0],step)
-			no_counted_slices = len(r)
-			print("no_counted_slices",no_counted_slices)
-			for j in range(no_counted_slices):
+			r=r[0:no_samples_seizure_ph]
+			for j in range(no_samples_seizure_ph):
 				if is_train_index[i]:
 					magnitudes[counter+j,ch] = magnitude[r[j]]
 					labels[counter+j] = 1
@@ -213,9 +209,9 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop,no_samples_normal_ph,no_samp
 					magnitudes[counter-j,ch] = magnitude[r[j]]
 					labels[counter-j] = 1
 		if is_train_index[i]:
-			train_counter += no_counted_slices
+			train_counter += no_samples_seizure_ph
 		else:
-			val_counter -= no_counted_slices
+			val_counter -= no_samples_seizure_ph
 
 	print "counter", counter
 	
@@ -334,7 +330,7 @@ def preprocess():
 
 	print("Loading and preprocessing data...")
 
-	multiplier = 16
+	multiplier = 6
 	no_normal = int(datasets.patient0.no_normal * args.debug_sub_ratio)
 	no_seizure = int(datasets.patient0.no_seizure * args.debug_sub_ratio)
 	no_samples_normal_ph = multiplier * no_seizure
@@ -386,8 +382,8 @@ def preprocess():
 	assert val_counter == train_counter-1
 	assert magnitudes.shape[0] == labels.shape[0]
 
-	labels = labels.astype(np.int32)
-	magnitudes = magnitudes.astype(np.float32)
+	#labels = labels.astype(np.int32)
+	#magnitudes = magnitudes.astype(np.float32)
 
 	print("Histogram:")
 	print np.bincount(labels)
@@ -452,25 +448,29 @@ def preprocess():
 		hkl.dump(data, 'preprocessedData.hkl',compression="lzf")
 
 def load_preprocessed():
+	#global include_userdata
 	global xTrain
 	global yTrain
-	global aTrain
+	#global aTrain
 	global xVal
 	global yVal
-	global aVal
+	#global aVal
+	global udTrain
+	global udVal
 
 	print("Loading preprocessed data....")
 	data = hkl.load('preprocessedData.hkl')
 	xTrain = data['xTrain']
-	udTrain = data['udTrain']	
 	yTrain = data['yTrain']
-	aTrain = data['aTrain']
+	#aTrain = data['aTrain']
 	xVal = data['xVal']
-	udVal = data['udVal']
 	yVal = data['yVal']
-	aVal = data['aVal']
+	#aVal = data['aVal']
+	# if include_userdata:
+	# 	udTrain = data['udTrain']
+	# 	udVal = data['udVal']	
 
-@profile
+#@profile
 def normalize_and_train(netSpec):
 	global xTrain
 	global xVal
@@ -497,11 +497,15 @@ def normalize_and_train(netSpec):
 	# normalization_data['stdev'] = stdev
 
 	if cfg['preprocess']['normalization'] == 'min_max_x255':
-		maximum = np.amax(xTrain, keepdims=True)
-		minimum = np.amin(xTrain, keepdims=True)
+		print "percentiles:"
+		for p in range(0,101,10):
+			print p, np.percentile(xTrain, p)
+		xTrain_mask = np.ma.masked_equal(xTrain,0.)
+		maximum = np.amax(xTrain_mask, keepdims=True)
+		minimum = np.amin(xTrain_mask, keepdims=True)
 		print "Normalizing with ", minimum, maximum
-		xTrain = (xTrain-minimum)/(maximum-minimum)*255.0
-		xVal = (xVal-minimum)/maximum*255.0
+		xTrain[xTrain>0.1] = (xTrain[xTrain>0.1]-minimum)/(maximum-minimum)*255.0
+		xVal[xVal>0.1] = (xVal[xVal>0.1]-minimum)/(maximum-minimum)*255.0
 		normalization_data['maximum'] = maximum
 		normalization_data['minimum'] = minimum
 
@@ -695,9 +699,11 @@ def test():
 		if include_userdata:
 			prediction = predict(netSpec, {'sensors':xVal,'user':udVal})
 			probabilities = netSpec.predict_proba({'sensors':xVal,'user':udVal})
+			print "probabilities.shape", probabilities.shape
 		else:
 			prediction = predict(netSpec, xVal)
 			probabilities = netSpec.predict_proba(xVal)
+			print "probabilities.shape", probabilities.shape
 
 	print("Showing last 30 test samples..")
 	print("Predictions:")
@@ -746,8 +752,9 @@ def test():
 	from sklearn.metrics import confusion_matrix
 	cm =  confusion_matrix(yVal,prediction)
 	print cm
-	#print cm*1.0/np.sum(cm)*100
-
+	
+	from sklearn.metrics import roc_auc_score
+	print roc_auc_score(yVal, probabilities[:,1])
 
 
 

@@ -25,7 +25,7 @@ def mat_to_nparray(path):
   # print mat['dataStruct']['sequence']
   return mat['dataStruct']['data'][0, 0]
 
-def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, overlap=265, height=64):
+def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, overlap=448, height=32):
 	for i in range(start, no_of_samples):
 		filename = basename+str(i)+suffix
 		sample = mat_to_nparray(filename)
@@ -152,7 +152,7 @@ def analyze_1h(basename, suffix, savedir, start, end, fft_width=512, overlap=265
 #analyze_1h('/home/eavsteen/seizure_detection/data/train_1/1_', '_1.mat','train_1', 1, 15)
 
 # analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_0.mat','train_1', 1, 15)
-# analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_1.mat','train_1', 1, 15)
+# analyze('/home/eavsteen/seizure_detection/data/train_1/1_', '_1.mat','train_1', 1, 46)
 # analyze('/home/eavsteen/seizure_detection/data/train_2/2_', '_0.mat','train_2', 1, 10)
 # analyze('/home/eavsteen/seizure_detection/data/train_2/2_', '_1.mat','train_2', 1, 10)
 # analyze('/home/eavsteen/seizure_detection/data/train_3/3_', '_0.mat','train_3', 1, 10)

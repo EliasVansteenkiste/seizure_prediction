@@ -1,9 +1,10 @@
+Configuration:
 preprocess:
-    floor: 0 
-    ceil: 128
+    floor: 0
+    ceil: 32
     fft_width: 512
     overlap: 448
-    magnitude_window: 24
+    magnitude_window: 512
     augmentation: shift
     normalization: min_max_x255
     include_userdata: false
@@ -11,4 +12,4 @@ training:
     model: net0
 evaluation:
     online_training: False
-    model: net0    
+    model: net0
