@@ -330,7 +330,7 @@ def preprocess():
 
 	print("Loading and preprocessing data...")
 
-	multiplier = 6
+	multiplier = 4
 	no_normal = int(datasets.patient0.no_normal * args.debug_sub_ratio)
 	no_seizure = int(datasets.patient0.no_seizure * args.debug_sub_ratio)
 	no_samples_normal_ph = multiplier * no_seizure
@@ -382,8 +382,8 @@ def preprocess():
 	assert val_counter == train_counter-1
 	assert magnitudes.shape[0] == labels.shape[0]
 
-	#labels = labels.astype(np.int32)
-	#magnitudes = magnitudes.astype(np.float32)
+	labels = labels.astype(np.int32)
+	magnitudes = magnitudes.astype(np.float32)
 
 	print("Histogram:")
 	print np.bincount(labels)
