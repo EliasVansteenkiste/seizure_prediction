@@ -69,7 +69,9 @@ parser.add_argument('--validation-ratio', dest='chosen_validation_ratio', action
 parser.add_argument('--shift', dest='shift', action='store', type=int, default=0,
 					help='Only at test time! Shift the window around the peak and predict for each shifted sample and add the probabilities. (default 0)')
 parser.add_argument('--no-channels', dest='no_channels', action='store', type=int, default=16,
-					help='The number of channels in the data (default: 4)')
+					help='The number of channels that will be used for training and inference (default: 16)')
+parser.add_argument('--channels', dest='channels', nargs='+', type=int, default=[0],
+					help='The channel numbers that will be used for training and inference (default: [0])')
 parser.add_argument('--target-gpu',dest='target_gpu', action='store', default="gpu0",
                    help='target gpu')
 parser.add_argument('--mode', dest='mode', action='store', default="None",
@@ -197,7 +199,13 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop):
 	global train_counter_normal
 	global val_counter_normal
 
-	"read data and preprocess (fft and slicing)"
+	print "read data and preprocess (fft and slicing)"
+	channels = []
+	if len(args.channels)<args.no_channels:
+		channels = range(args.no_channels)
+	else:
+		channels = args.channels
+	print "read in channels"
 	
 	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
 	print path
@@ -209,7 +217,7 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop):
 		sys.stdout.flush()
 		data_1h = read_data_1h(path,'_0.mat',i*6+1)
 		ch_arrays = []
-		for ch in range(args.no_channels):
+		for ch in channels:
 			ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
 		magnitude = np.stack(ch_arrays, axis=0)
 		if is_train_index[i]:
@@ -219,6 +227,7 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop):
 			magnitudes_normal_val[val_counter_normal] = magnitude
 			val_counter_normal += 1
 
+
 	# read in seizure 
 	is_train_index = get_train_val_split(s_stop)
 	for i in xrange(s_start,s_stop):
@@ -226,7 +235,7 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop):
 		sys.stdout.flush()
 		data_1h = read_data_1h(path,'_1.mat',i*6+1)
 		ch_arrays = []
-		for ch in range(args.no_channels):
+		for ch in channels:
 			ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
 		magnitude = np.stack(ch_arrays, axis=0)
 		if is_train_index[i]:
@@ -281,8 +290,8 @@ def preprocess():
 	print("Loading and preprocessing data...")
 
 
-	no_normal = int(datasets.patient0.no_normal * args.debug_sub_ratio)
-	no_seizure = int(datasets.patient0.no_seizure * args.debug_sub_ratio)
+	no_normal = int(datasets.patient1.no_normal * args.debug_sub_ratio)
+	no_seizure = int(datasets.patient1.no_seizure * args.debug_sub_ratio)
 	
 	no_normal_train = int(math.floor((1-args.chosen_validation_ratio)*no_normal))
 	no_seizure_train = int(math.floor((1-args.chosen_validation_ratio)*no_seizure))
@@ -311,7 +320,7 @@ def preprocess():
 	train_counter_normal = 0
 	val_counter_normal = 0
 
-	dss = [datasets.patient0]
+	dss = [datasets.patient1]
 	no_dss = len(dss)
 
 	for dataset in dss:

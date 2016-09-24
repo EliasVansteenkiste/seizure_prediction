@@ -36,6 +36,7 @@ def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, over
 			fig = plt.figure()
 			plt.imshow(np.flipud(magnitude.transpose()),vmin=20 , vmax=4000, aspect='auto', interpolation='none')
 			fig.savefig( 'figures/'+savedir+'/ch'+str(ch)+'/test'+str(i)+suffix+'.png')
+		plt.close('all')
 		# print "m0", np.amin(magnitude0), np.amax(magnitude0), np.mean(magnitude0), np.average(magnitude0)
 		# print "m1", np.amin(magnitude1), np.amax(magnitude1), np.mean(magnitude1), np.average(magnitude1)
 		# print "m2", np.amin(magnitude2), np.amax(magnitude2), np.mean(magnitude2), np.average(magnitude2)
@@ -139,6 +140,7 @@ def analyze_1h(basename, suffix, savedir, start, end, fft_width=512, overlap=265
 		no_channels = sample.shape[1]
 		for ch in range(no_channels):
 			magnitude = calcFFT(sample[:,ch],fft_width,overlap)[:,:height]
+                        print "five percentile", np.percentile(magnitude,5)
 			fig = plt.figure()
 			plt.imshow(np.flipud(magnitude.transpose()),vmin=20 , vmax=4000, aspect='auto', interpolation='none')
 			fig_filename = 'figures/'+savedir+'/ch'+str(ch)+'/test_1h_'+str(i)+suffix+'.png'

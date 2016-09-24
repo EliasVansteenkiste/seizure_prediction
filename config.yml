@@ -1,9 +1,9 @@
 Configuration:
 preprocess:
     floor: 0
-    ceil: 32
-    fft_width: 512
-    overlap: 448
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
     magnitude_window: 512
     augmentation: shift
     normalization: min_max_x255
