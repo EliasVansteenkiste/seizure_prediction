@@ -851,9 +851,7 @@ def test():
 	probabilities_hour = []
 	for mag_hour in magnitudes_normal_val:
 		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		print "patches.shape", patches.shape
 		predictions_patches = netSpec.predict_proba(patches[0])
-		print predictions_patches.shape
 		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
 		print prediction_hour
 		probabilities_hour.append(prediction_hour[1])
@@ -861,17 +859,17 @@ def test():
 	print "magnitudes_seizure_val.shape", magnitudes_seizure_val.shape
 	for mag_hour in magnitudes_seizure_val:
 		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		print "patches.shape", patches.shape
 		predictions_patches = netSpec.predict_proba(patches[0])
-		print predictions_patches.shape
 		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
 		print prediction_hour
 		probabilities_hour.append(prediction_hour[1])
 
 	yVal_hour = np.hstack((np.zeros(magnitudes_normal_val.shape[0]),np.ones(magnitudes_seizure_val.shape[0])))
 	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
-
-
+	predictions_hour = np.round(probabilities_hour)
+	result_hour = yVal_hour==predictions_hour
+	acc_val_hour = float(np.sum(result_hour))/float(len(result_hour))
+	print "Accuracy validation for the hours: ", acc_val_hour
 
 
 
