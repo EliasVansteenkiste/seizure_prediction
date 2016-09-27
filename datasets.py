@@ -9,6 +9,7 @@ class DataSet:
 		self.no_normal = no_normal
 		self.base_name = base_name
 		self.set_name = set_name
+		self.user = user
 		self.blacklisted_samples = blacklisted_samples
 		if self.blacklisted_samples == None:
 			self.blacklisted_samples = []

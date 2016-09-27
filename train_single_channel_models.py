@@ -9,9 +9,10 @@ from itertools import izip
 
 model_filename = "run1.pickle"
 config_filename = 'config.yml'
-data_path = '/local/seizure_detection/data'
+data_path = '/home/eavsteen/seizure_detection/data'
 target_gpu = 'gpu0'
-common_args = ['--debug-sub-ratio=1', '--model-filename='+model_filename,'--config-filename='+config_filename, '--no-channels=1', '--target-gpu='+target_gpu, '--data-path='+data_path]
+user = 'patient1'
+common_args = ['--debug-sub-ratio=1', '--model-filename='+model_filename,'--config-filename='+config_filename, '--no-channels=1', '--target-gpu='+target_gpu, '--data-path='+data_path, '--patients='+user]
 
 
 

@@ -25,6 +25,7 @@ import argparse
 import gc
 #from memory_profiler import profile
 import psutil
+import scipy
 
 
 from sklearn.base import clone
@@ -76,6 +77,8 @@ parser.add_argument('--target-gpu',dest='target_gpu', action='store', default="g
                    help='target gpu')
 parser.add_argument('--mode', dest='mode', action='store', default="None",
                    help='single-channel/dual-channel/none (default: none)')
+parser.add_argument('--patients', dest='patients', nargs='+', default=['patient0'],
+					help='the target patients')
 args = parser.parse_args()
 
 print "Command line arguments:", args
@@ -117,6 +120,12 @@ height=fft_width/2
 assert ceil-floor <= fft_width / 2
 assert ceil <= fft_width / 2
 
+for dataset in datasets.all:
+	if dataset.user in args.patients:
+		dataset.enabled = True
+	else:
+		dataset.enabled = False
+
 
 def normalize(x):
 	return x/2000*255
@@ -125,7 +134,8 @@ from nolearn.lasagne import BatchIterator
 
 class SelectBatchIteratorTrain(BatchIterator):
 
-	slice_size = 512
+	slice_size = magnitude_window
+	no_trials = 20
 
 	def transform(self, Xb, yb):
 		global magnitudes_seizure_train
@@ -139,14 +149,42 @@ class SelectBatchIteratorTrain(BatchIterator):
 		Xb_new = np.empty(new_shape)
 
 		for idx in range(bs):
-			r = xrange(magnitudes_seizure_train.shape[2]-self.slice_size)
-			start = np.random.choice(r)
 			if yb[idx]:
+				best = -1
+				best_border=100
 				hour = int(math.floor(np.random.random_sample() * magnitudes_seizure_train.shape[0]))
-				Xb_new[idx] = magnitudes_seizure_train[hour, :, start:start+self.slice_size]
+				for k in range(self.no_trials):
+					r = xrange(magnitudes_seizure_train.shape[2]-self.slice_size)
+					start = np.random.choice(r)
+					slice = magnitudes_seizure_train[hour, :, start:start+self.slice_size]
+					twop = np.percentile(slice,2)
+					if twop>0.1:
+						best = slice
+						break
+					else:
+						border = scipy.stats.percentileofscore(slice,0.0000001)
+						if border<best_border:
+							best_border = border
+							best = slice
+				Xb_new[idx] = best
 			else:
+				best = -1
+				best_border=100
 				hour = int(math.floor(np.random.random_sample() * magnitudes_normal_train.shape[0]))
-				Xb_new[idx] = magnitudes_normal_train[hour, :, start:start+self.slice_size]
+				for k in range(self.no_trials):
+					r = xrange(magnitudes_normal_train.shape[2]-self.slice_size)
+					start = np.random.choice(r)
+					slice = magnitudes_normal_train[hour, :, start:start+self.slice_size]
+					twop = np.percentile(slice,2)
+					if twop>0.1:
+						best = slice
+						break
+					else:
+						border = scipy.stats.percentileofscore(slice,0.0000001)
+						if border<best_border:
+							best_border = border
+							best = slice
+				Xb_new[idx] = best
 
 		Xb_new = normalize(Xb_new)
 		Xb_new = Xb_new.astype(np.float32)
@@ -154,7 +192,8 @@ class SelectBatchIteratorTrain(BatchIterator):
 
 class SelectBatchIteratorTest(BatchIterator):
 
-	slice_size = 512
+	slice_size = magnitude_window
+	no_trials = 20
 
 	def transform(self, Xb, yb):
 		global magnitudes_seizure_val
@@ -168,22 +207,50 @@ class SelectBatchIteratorTest(BatchIterator):
 		Xb_new = np.empty(new_shape)
 
 		for idx in range(bs):
-			r = xrange(magnitudes_seizure_val.shape[2]-self.slice_size)
-			start = np.random.choice(r)
+			label = None
+			x_rand = None
 			if yb != None:
-				if yb[idx]:
-					hour = int(math.floor(Xb[idx] * magnitudes_seizure_val.shape[0]))
-					Xb_new[idx] = magnitudes_seizure_val[hour, :, start:start+self.slice_size]
-				else:
-					hour = int(math.floor(Xb[idx] * magnitudes_normal_val.shape[0]))
-					Xb_new[idx] = magnitudes_normal_val[hour, :, start:start+self.slice_size]
+				label = yb[idx]
+				x_rand = Xb[idx]
 			else:
-				if Xb[idx,1]:
-					hour = int(math.floor(Xb[idx,0] * magnitudes_seizure_val.shape[0]))
-					Xb_new[idx] = magnitudes_seizure_val[hour, :, start:start+self.slice_size]
-				else:
-					hour = int(math.floor(Xb[idx,0] * magnitudes_normal_val.shape[0]))
-					Xb_new[idx] = magnitudes_normal_val[hour, :, start:start+self.slice_size]
+				label = Xb[idx,1]
+				x_rand = Xb[idx,0]
+			if label:
+				best = -1
+				best_border=100
+				hour = int(math.floor(x_rand * magnitudes_seizure_val.shape[0]))
+				for k in range(self.no_trials):
+					r = xrange(magnitudes_seizure_val.shape[2]-self.slice_size)
+					start = np.random.choice(r)
+					slice = magnitudes_seizure_val[hour, :, start:start+self.slice_size]
+					twop = np.percentile(slice,2)
+					if twop>0.1:
+						best = slice
+						break
+					else:
+						border = scipy.stats.percentileofscore(slice,0.0000001)
+						if border<best_border:
+							best_border = border
+							best = slice
+				Xb_new[idx] = best
+			else:
+				best = -1
+				best_border=100
+				hour = int(math.floor(x_rand * magnitudes_normal_val.shape[0]))
+				for k in range(self.no_trials):
+					r = xrange(magnitudes_normal_val.shape[2]-self.slice_size)
+					start = np.random.choice(r)
+					slice = magnitudes_normal_val[hour, :, start:start+self.slice_size]
+					twop = np.percentile(slice,2)
+					if twop>0.1:
+						best = slice
+						break
+					else:
+						border = scipy.stats.percentileofscore(slice,0.0000001)
+						if border<best_border:
+							best_border = border
+							best = slice
+				Xb_new[idx] = best
 
 		Xb_new = normalize(Xb_new)
 		Xb_new = Xb_new.astype(np.float32)
@@ -289,9 +356,13 @@ def preprocess():
 
 	print("Loading and preprocessing data...")
 
+	no_normal = 0
+	no_seizure = 0
 
-	no_normal = int(datasets.patient1.no_normal * args.debug_sub_ratio)
-	no_seizure = int(datasets.patient1.no_seizure * args.debug_sub_ratio)
+	for dataset in datasets.all:
+		if dataset.enabled:
+			no_normal += int(dataset.no_normal * args.debug_sub_ratio)
+			no_seizure += int(dataset.no_seizure * args.debug_sub_ratio)
 	
 	no_normal_train = int(math.floor((1-args.chosen_validation_ratio)*no_normal))
 	no_seizure_train = int(math.floor((1-args.chosen_validation_ratio)*no_seizure))
@@ -320,14 +391,16 @@ def preprocess():
 	train_counter_normal = 0
 	val_counter_normal = 0
 
-	dss = [datasets.patient1]
-	no_dss = len(dss)
+	no_dss = 0
+	for dataset in datasets.all:
+		if dataset.enabled:
+			no_dss += 1
 
-	for dataset in dss:
-		print "Read in dataset from %s ..."%(dataset.set_name)
-		print "Processing data ..."
-		
-		read_data(dataset,0,no_normal,0,no_seizure)
+	for dataset in datasets.all:
+		if dataset.enabled:
+			print "Read in dataset from %s ..."%(dataset.set_name)
+			print "Processing data ..."
+			read_data(dataset,0,no_normal,0,no_seizure)
 
 
 	process = psutil.Process(os.getpid())
@@ -690,7 +763,7 @@ def test():
 	print cm
 	
 	from sklearn.metrics import roc_auc_score
-	print roc_auc_score(yVal, probabilities[:,1])
+	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
 
 
 
