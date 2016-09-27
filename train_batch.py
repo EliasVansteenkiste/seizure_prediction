@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
 
-from tools.utils import calcFFT
+from tools.utils import calcFFT, rolling_window_ext
 from tools.analyze import read_data_1h
 
 import numpy as np
@@ -132,7 +132,7 @@ def normalize(x):
 
 from nolearn.lasagne import BatchIterator
 
-class SelectBatchIteratorTrain(BatchIterator):
+class BI_skip_droput_train(BatchIterator):
 
 	slice_size = magnitude_window
 	no_trials = 20
@@ -141,7 +141,7 @@ class SelectBatchIteratorTrain(BatchIterator):
 		global magnitudes_seizure_train
 		global magnitudes_normal_train
 
-		Xb, yb = super(SelectBatchIteratorTrain, self).transform(Xb, yb)
+		Xb, yb = super(BI_skip_droput_train, self).transform(Xb, yb)
 
 		# Select and normalize:
 		bs = Xb.shape[0]
@@ -190,7 +190,7 @@ class SelectBatchIteratorTrain(BatchIterator):
 		Xb_new = Xb_new.astype(np.float32)
 		return Xb_new, yb
 
-class SelectBatchIteratorTest(BatchIterator):
+class BI_skip_droput_test(BatchIterator):
 
 	slice_size = magnitude_window
 	no_trials = 20
@@ -199,7 +199,7 @@ class SelectBatchIteratorTest(BatchIterator):
 		global magnitudes_seizure_val
 		global magnitudes_normal_val
 
-		Xb, yb = super(SelectBatchIteratorTest, self).transform(Xb, yb)
+		Xb, yb = super(BI_skip_droput_test, self).transform(Xb, yb)
 
 		# Select and normalize:
 		bs = Xb.shape[0]
@@ -251,6 +251,83 @@ class SelectBatchIteratorTest(BatchIterator):
 							best_border = border
 							best = slice
 				Xb_new[idx] = best
+
+		Xb_new = normalize(Xb_new)
+		Xb_new = Xb_new.astype(np.float32)
+		return Xb_new, yb
+
+
+class BI_train(BatchIterator):
+
+	slice_size = magnitude_window
+	no_trials = 20
+
+	def transform(self, Xb, yb):
+		global magnitudes_seizure_train
+		global magnitudes_normal_train
+
+		Xb, yb = super(BI_train, self).transform(Xb, yb)
+
+		# Select and normalize:
+		bs = Xb.shape[0]
+		new_shape = (bs,args.no_channels,self.slice_size,ceil-floor)
+		Xb_new = np.empty(new_shape)
+
+		for idx in range(bs):
+			if yb[idx]:
+				hour = int(math.floor(np.random.random_sample() * magnitudes_seizure_train.shape[0]))
+				r = xrange(magnitudes_seizure_train.shape[2]-self.slice_size)
+				start = np.random.choice(r)
+				slice = magnitudes_seizure_train[hour, :, start:start+self.slice_size]
+				Xb_new[idx] = slice
+			else:
+				hour = int(math.floor(np.random.random_sample() * magnitudes_normal_train.shape[0]))
+				r = xrange(magnitudes_normal_train.shape[2]-self.slice_size)
+				start = np.random.choice(r)
+				slice = magnitudes_normal_train[hour, :, start:start+self.slice_size]
+				Xb_new[idx] = slice
+
+		Xb_new = normalize(Xb_new)
+		Xb_new = Xb_new.astype(np.float32)
+		return Xb_new, yb
+
+class BI_test(BatchIterator):
+
+	slice_size = magnitude_window
+	no_trials = 20
+
+	def transform(self, Xb, yb):
+		global magnitudes_seizure_val
+		global magnitudes_normal_val
+
+		Xb, yb = super(BI_test, self).transform(Xb, yb)
+
+		# Select and normalize:
+		bs = Xb.shape[0]
+		new_shape = (bs,args.no_channels,self.slice_size,ceil-floor)
+		Xb_new = np.empty(new_shape)
+
+		for idx in range(bs):
+			label = None
+			x_rand = None
+			if yb != None:
+				label = yb[idx]
+				x_rand = Xb[idx]
+			else:
+				label = Xb[idx,1]
+				x_rand = Xb[idx,0]
+			if label:
+				hour = int(math.floor(x_rand * magnitudes_seizure_val.shape[0]))
+				r = xrange(magnitudes_seizure_val.shape[2]-self.slice_size)
+				start = np.random.choice(r)
+				slice = magnitudes_seizure_val[hour, :, start:start+self.slice_size]
+				Xb_new[idx] = slice
+			else:
+				hour = int(math.floor(x_rand * magnitudes_normal_val.shape[0]))
+				r = xrange(magnitudes_normal_val.shape[2]-self.slice_size)
+				start = np.random.choice(r)
+				slice = magnitudes_normal_val[hour, :, start:start+self.slice_size]
+				Xb_new[idx] = slice
 
 		Xb_new = normalize(Xb_new)
 		Xb_new = Xb_new.astype(np.float32)
@@ -369,6 +446,7 @@ def preprocess():
 	
 	test = read_data_1h(data_path+'/train_1/1_','_0.mat',1)
 	test_magnitude = calcFFT(test[:,0],fft_width,overlap)[:,floor:ceil]
+	print "test_magnitude.shape", test_magnitude.shape
 	stft_steps = test_magnitude.shape[0]
 
 
@@ -765,6 +843,41 @@ def test():
 	from sklearn.metrics import roc_auc_score
 	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
 
+	print "Changing batch iterator test:"
+	netSpec.batch_iterator_test = BatchIterator(batch_size=256)
+	print "Calculating final prediction for the hour long sessions"
+
+	print "magnitudes_normal_val.shape", magnitudes_normal_val.shape
+	probabilities_hour = []
+	for mag_hour in magnitudes_normal_val:
+		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+		print "patches.shape", patches.shape
+		predictions_patches = netSpec.predict_proba(patches[0])
+		print predictions_patches.shape
+		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		print prediction_hour
+		probabilities_hour.append(prediction_hour[1])
+
+	print "magnitudes_seizure_val.shape", magnitudes_seizure_val.shape
+	for mag_hour in magnitudes_seizure_val:
+		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+		print "patches.shape", patches.shape
+		predictions_patches = netSpec.predict_proba(patches[0])
+		print predictions_patches.shape
+		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		print prediction_hour
+		probabilities_hour.append(prediction_hour[1])
+
+	yVal_hour = np.hstack((np.zeros(magnitudes_normal_val.shape[0]),np.ones(magnitudes_seizure_val.shape[0])))
+	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
+
+
+
+
+
+
+
+
 
 
 data_path = args.data_path
@@ -803,9 +916,9 @@ else:
 	no_channels = args.no_channels
 
 if args.no_training:
-	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=SelectBatchIteratorTrain(batch_size=128),batch_iterator_test=SelectBatchIteratorTest(batch_size=128))
+	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=BI_train(batch_size=128),batch_iterator_test=BI_test(batch_size=128))
 else:
-	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=SelectBatchIteratorTrain(batch_size=128),batch_iterator_test=SelectBatchIteratorTest(batch_size=128))	
+	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=BI_train(batch_size=128),batch_iterator_test=BI_test(batch_size=128))	
 
 if args.no_training:
 	netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)
