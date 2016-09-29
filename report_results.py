@@ -46,7 +46,7 @@ for line in lines:
         print "No. learnable parameters:", words[4]
         found_parameters = True
 print
-acc = "Accuracy validation:"
+acc = "Accuracy validation"
 auc = "auc"
 
 for line in lines:

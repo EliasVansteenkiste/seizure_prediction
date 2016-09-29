@@ -132,6 +132,11 @@ def read_data_1h(basename, suffix, start):
 		sample = np.vstack((sample,slice))
 	return sample
 
+def read_data(basename, suffix, start):
+	filename = basename+str(start)+suffix
+	sample = mat_to_nparray(filename)
+	return sample
+
 def analyze_1h(basename, suffix, savedir, start, end, fft_width=512, overlap=265, height=64):
 	session = 0
 	for i in range(start, end, 6):
