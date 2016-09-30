@@ -1,6 +1,8 @@
 #!/home/robo_external/.local/bin python
 # -*- coding: utf-8 -*-
 
+import global_vars as g
+g.init()
 import sys
 import os
 import datetime
@@ -12,7 +14,7 @@ from matplotlib import pyplot as plt
 from matplotlib import gridspec
 
 from tools.utils import calcFFT, rolling_window_ext
-from tools.analyze import read_data_1h
+from tools.analyze import read_data_1h, read_data
 
 import numpy as np
 import hickle as hkl
@@ -27,13 +29,9 @@ import gc
 import psutil
 import scipy
 
-
 from sklearn.base import clone
 
-
 import datasets
-
-
 
 #https://docs.python.org/2/library/argparse.html
 parser = argparse.ArgumentParser(description='Preprocess/Train/Validate all data.')
@@ -71,15 +69,15 @@ parser.add_argument('--shift', dest='shift', action='store', type=int, default=0
 					help='Only at test time! Shift the window around the peak and predict for each shifted sample and add the probabilities. (default 0)')
 parser.add_argument('--no-channels', dest='no_channels', action='store', type=int, default=16,
 					help='The number of channels that will be used for training and inference (default: 16)')
-parser.add_argument('--channels', dest='channels', nargs='+', type=int, default=[0],
-					help='The channel numbers that will be used for training and inference (default: [0])')
 parser.add_argument('--target-gpu',dest='target_gpu', action='store', default="gpu0",
                    help='target gpu')
 parser.add_argument('--mode', dest='mode', action='store', default="None",
                    help='single-channel/dual-channel/none (default: none)')
 parser.add_argument('--patients', dest='patients', nargs='+', default=['patient0'],
 					help='the target patients')
-args = parser.parse_args()
+
+g.args = parser.parse_args()
+args = g.args
 
 print "Command line arguments:", args
 print "Git reference: ",
@@ -104,7 +102,8 @@ with open(args.config_filename, 'r') as ymlfile:
 	print ymlfile.read()
 	print "end Configuration"
 	ymlfile.seek(0)
-	cfg = yaml.load(ymlfile)
+	g.cfg = yaml.load(ymlfile)
+cfg = g.cfg
 
 sys.stdout.flush()
 
@@ -120,243 +119,45 @@ height=fft_width/2
 assert ceil-floor <= fft_width / 2
 assert ceil <= fft_width / 2
 
+global patients
+patients = dict()
+
+print args.patients
+print type(args.patients)
+for i in range(len(args.patients)):
+	patient = args.patients[i]
+	words = patient.split('_')
+	user = words[0]
+	channels = np.empty((args.no_channels),dtype=np.int32)
+	for ch in range(args.no_channels):
+		channels[ch] = int(words[ch+1])
+	patients[user]=channels
+
 for dataset in datasets.all:
-	if dataset.user in args.patients:
+	if dataset.user in patients.keys():
 		dataset.enabled = True
 	else:
 		dataset.enabled = False
 
 
-def normalize(x):
-	return x/2000*255
-
-from nolearn.lasagne import BatchIterator
-
-class BI_skip_droput_train(BatchIterator):
-
-	slice_size = magnitude_window
-	no_trials = 20
-
-	def transform(self, Xb, yb):
-		global magnitudes_seizure_train
-		global magnitudes_normal_train
-
-		Xb, yb = super(BI_skip_droput_train, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,args.no_channels,self.slice_size,ceil-floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			if yb[idx]:
-				best = -1
-				best_border=100
-				hour = int(math.floor(np.random.random_sample() * magnitudes_seizure_train.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(magnitudes_seizure_train.shape[2]-self.slice_size)
-					start = np.random.choice(r)
-					slice = magnitudes_seizure_train[hour, :, start:start+self.slice_size]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-			else:
-				best = -1
-				best_border=100
-				hour = int(math.floor(np.random.random_sample() * magnitudes_normal_train.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(magnitudes_normal_train.shape[2]-self.slice_size)
-					start = np.random.choice(r)
-					slice = magnitudes_normal_train[hour, :, start:start+self.slice_size]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_skip_droput_test(BatchIterator):
-
-	slice_size = magnitude_window
-	no_trials = 20
-
-	def transform(self, Xb, yb):
-		global magnitudes_seizure_val
-		global magnitudes_normal_val
-
-		Xb, yb = super(BI_skip_droput_test, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,args.no_channels,self.slice_size,ceil-floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			label = None
-			x_rand = None
-			if yb != None:
-				label = yb[idx]
-				x_rand = Xb[idx]
-			else:
-				label = Xb[idx,1]
-				x_rand = Xb[idx,0]
-			if label:
-				best = -1
-				best_border=100
-				hour = int(math.floor(x_rand * magnitudes_seizure_val.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(magnitudes_seizure_val.shape[2]-self.slice_size)
-					start = np.random.choice(r)
-					slice = magnitudes_seizure_val[hour, :, start:start+self.slice_size]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-			else:
-				best = -1
-				best_border=100
-				hour = int(math.floor(x_rand * magnitudes_normal_val.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(magnitudes_normal_val.shape[2]-self.slice_size)
-					start = np.random.choice(r)
-					slice = magnitudes_normal_val[hour, :, start:start+self.slice_size]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-
-class BI_train(BatchIterator):
-
-	slice_size = magnitude_window
-	no_trials = 20
-
-	def transform(self, Xb, yb):
-		global magnitudes_seizure_train
-		global magnitudes_normal_train
-
-		Xb, yb = super(BI_train, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,args.no_channels,self.slice_size,ceil-floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			if yb[idx]:
-				hour = int(math.floor(np.random.random_sample() * magnitudes_seizure_train.shape[0]))
-				r = xrange(magnitudes_seizure_train.shape[2]-self.slice_size)
-				start = np.random.choice(r)
-				slice = magnitudes_seizure_train[hour, :, start:start+self.slice_size]
-				Xb_new[idx] = slice
-			else:
-				hour = int(math.floor(np.random.random_sample() * magnitudes_normal_train.shape[0]))
-				r = xrange(magnitudes_normal_train.shape[2]-self.slice_size)
-				start = np.random.choice(r)
-				slice = magnitudes_normal_train[hour, :, start:start+self.slice_size]
-				Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_test(BatchIterator):
-
-	slice_size = magnitude_window
-	no_trials = 20
-
-	def transform(self, Xb, yb):
-		global magnitudes_seizure_val
-		global magnitudes_normal_val
-
-		Xb, yb = super(BI_test, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,args.no_channels,self.slice_size,ceil-floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			label = None
-			x_rand = None
-			if yb != None:
-				label = yb[idx]
-				x_rand = Xb[idx]
-			else:
-				label = Xb[idx,1]
-				x_rand = Xb[idx,0]
-			if label:
-				hour = int(math.floor(x_rand * magnitudes_seizure_val.shape[0]))
-				r = xrange(magnitudes_seizure_val.shape[2]-self.slice_size)
-				start = np.random.choice(r)
-				slice = magnitudes_seizure_val[hour, :, start:start+self.slice_size]
-				Xb_new[idx] = slice
-			else:
-				hour = int(math.floor(x_rand * magnitudes_normal_val.shape[0]))
-				r = xrange(magnitudes_normal_val.shape[2]-self.slice_size)
-				start = np.random.choice(r)
-				slice = magnitudes_normal_val[hour, :, start:start+self.slice_size]
-				Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-def read_data(dataset,n_start,n_stop,s_start,s_stop):
-	global magnitudes_seizure_val
-	global magnitudes_seizure_train
-	global magnitudes_normal_val
-	global magnitudes_normal_train
+def read_train_data(dataset,k_normal_val,k_normal_train,k_seizure_val,k_seizure_train):
 	global train_counter_seizure
 	global val_counter_seizure
 	global train_counter_normal
 	global val_counter_normal
+	global patients
 
 	print "read data and preprocess (fft and slicing)"
-	channels = []
-	if len(args.channels)<args.no_channels:
-		channels = range(args.no_channels)
-	else:
-		channels = args.channels
-	print "read in channels"
+	channels = patients[dataset.user]
+	print "read in channels", channels
 	
 	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
 	print path
 
 	# read in normal 
-	is_train_index = get_train_val_split(n_stop)
-	for i in xrange(n_start,n_stop):
+	is_train_index = get_train_val_split(k_normal_train,k_normal_val)
+	no_normal = k_normal_val + k_normal_train
+	for i in xrange(no_normal):
 		print "normal i", i
 		sys.stdout.flush()
 		data_1h = read_data_1h(path,'_0.mat',i*6+1)
@@ -365,16 +166,16 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop):
 			ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
 		magnitude = np.stack(ch_arrays, axis=0)
 		if is_train_index[i]:
-			magnitudes_normal_train[train_counter_normal] = magnitude
+			g.magnitudes_normal_train[train_counter_normal] = magnitude
 			train_counter_normal += 1
 		else:
-			magnitudes_normal_val[val_counter_normal] = magnitude
+			g.magnitudes_normal_val[val_counter_normal] = magnitude
 			val_counter_normal += 1
 
-
 	# read in seizure 
-	is_train_index = get_train_val_split(s_stop)
-	for i in xrange(s_start,s_stop):
+	is_train_index = get_train_val_split(k_seizure_train,k_seizure_val)
+	no_seizure = k_seizure_val + k_seizure_train
+	for i in xrange(no_seizure):
 		print "seizure i", i
 		sys.stdout.flush()
 		data_1h = read_data_1h(path,'_1.mat',i*6+1)
@@ -383,27 +184,50 @@ def read_data(dataset,n_start,n_stop,s_start,s_stop):
 			ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
 		magnitude = np.stack(ch_arrays, axis=0)
 		if is_train_index[i]:
-			magnitudes_seizure_train[train_counter_seizure] = magnitude
+			g.magnitudes_seizure_train[train_counter_seizure] = magnitude
 			train_counter_seizure += 1
 		else:
-			magnitudes_seizure_val[val_counter_seizure] = magnitude
+			g.magnitudes_seizure_val[val_counter_seizure] = magnitude
 			val_counter_seizure += 1
 	
-	print "Done reading in", n_stop-n_start, "no seizure hours and", s_stop-s_start, "seizure hours"
+	print "Done reading in", no_normal, "no seizure hours and", no_seizure, "seizure hours"
 
-def get_train_val_split(no):
+def read_test_data(dataset,start,stop):
+	global magnitudes_test
+	global test_counter
+
+	print "read data and preprocess (fft and slicing)"
+	channels = patients[dataset.user]
+	print "read in channels", channels
+	
+	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
+	print path
+
+	# read in normal 
+	for i in xrange(start,stop):
+		#print "test i", i
+		sys.stdout.flush()
+		data = read_data(path,'.mat',i+1)
+		ch_arrays = []
+		for ch in channels:
+			ch_arrays.append(calcFFT(data[:,ch],fft_width,overlap)[:,floor:ceil])
+		magnitude = np.stack(ch_arrays, axis=0)
+		magnitudes_test[test_counter] = magnitude
+		test_counter += 1
+
+
+	print "Done reading in", stop-start, "test snippets of 10min."
+
+def get_train_val_split(train_no,val_no):
+	no = train_no + val_no
 	if args.fixed_seed:
 		random.seed(0) 
 		np.random.seed(0)
 	all_indices = np.arange(no)
-	print all_indices
 	if args.shuffle_before_split:
 		np.random.shuffle(all_indices)
-	train_no = int(math.floor((1-args.chosen_validation_ratio)*no))
-	print train_no
 	train_file_indices = all_indices[:train_no]
 	is_train_index = np.zeros(no, dtype=np.bool)
-	print train_file_indices
 	is_train_index[train_file_indices] = True
 	# val_no = no - train_no
 	# val_indices = all_indices[train_no:]
@@ -419,10 +243,6 @@ def preprocess():
 	global udVal
 	global yVal
 	global aVal
-	global magnitudes_seizure_val
-	global magnitudes_seizure_train
-	global magnitudes_normal_val
-	global magnitudes_normal_train
 	global train_counter_seizure
 	global val_counter_seizure
 	global train_counter_normal
@@ -433,16 +253,31 @@ def preprocess():
 
 	print("Loading and preprocessing data...")
 
-	no_normal = 0
-	no_seizure = 0
+	no_normal_train = 0
+	no_normal_val = 0
+	no_seizure_train = 0
+	no_seizure_val = 0
 
 	for dataset in datasets.all:
 		if dataset.enabled:
-			no_normal += int(dataset.no_normal * args.debug_sub_ratio)
-			no_seizure += int(dataset.no_seizure * args.debug_sub_ratio)
+			no_normal_val += int(dataset.no_normal * args.debug_sub_ratio * args.chosen_validation_ratio)
+			no_normal_train += int(dataset.no_normal * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
+			no_seizure_val += int(dataset.no_seizure * args.debug_sub_ratio * args.chosen_validation_ratio)
+			no_seizure_train += int(dataset.no_seizure * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
 	
-	no_normal_train = int(math.floor((1-args.chosen_validation_ratio)*no_normal))
-	no_seizure_train = int(math.floor((1-args.chosen_validation_ratio)*no_seizure))
+
+	no_normal = no_normal_val + no_normal_train
+	no_seizure = no_seizure_val + no_seizure_train
+
+	print "total"
+	print no_normal
+	print no_seizure
+	print "train"
+	print no_normal_train
+	print no_seizure_train
+	print "validation"
+	print no_normal_val
+	print no_seizure_val
 	
 	test = read_data_1h(data_path+'/train_1/1_','_0.mat',1)
 	test_magnitude = calcFFT(test[:,0],fft_width,overlap)[:,floor:ceil]
@@ -450,11 +285,15 @@ def preprocess():
 	stft_steps = test_magnitude.shape[0]
 
 
+	print no_seizure_train
+	print no_seizure-no_seizure_train
+	print no_normal_train
+	print no_normal-no_normal_train
 
-	magnitudes_seizure_train = np.zeros((no_seizure_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	magnitudes_seizure_val = np.zeros((no_seizure-no_seizure_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	magnitudes_normal_train = np.zeros((no_normal_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	magnitudes_normal_val = np.zeros((no_normal-no_normal_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	g.magnitudes_seizure_train = np.zeros((no_seizure_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	g.magnitudes_seizure_val = np.zeros((no_seizure_val,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	g.magnitudes_normal_train = np.zeros((no_normal_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	g.magnitudes_normal_val = np.zeros((no_normal_val,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
 	
 
 	# analysis_datas = np.zeros(size, dtype=analysis_data_type)
@@ -475,11 +314,16 @@ def preprocess():
 			no_dss += 1
 
 	for dataset in datasets.all:
-		if dataset.enabled:
+		if dataset.enabled and dataset.trainset:
 			print "Read in dataset from %s ..."%(dataset.set_name)
 			print "Processing data ..."
-			read_data(dataset,0,no_normal,0,no_seizure)
-
+			k_normal_val = int(dataset.no_normal * args.debug_sub_ratio * args.chosen_validation_ratio)
+			k_normal_train = int(dataset.no_normal * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
+			k_seizure_val = int(dataset.no_seizure * args.debug_sub_ratio * args.chosen_validation_ratio)
+			k_seizure_train = int(dataset.no_seizure * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
+			read_train_data(dataset,k_normal_val,k_normal_train,k_seizure_val,k_seizure_train)
+			print 'train_counter_seizure', train_counter_seizure, 'val_counter_seizure', val_counter_seizure
+			print 'train_counter_normal', train_counter_normal, 'val_counter_normal', val_counter_normal
 
 	process = psutil.Process(os.getpid())
 	print("Memory usage (GB): "+str(process.memory_info().rss/1e9))
@@ -489,7 +333,7 @@ def preprocess():
 
 	print "percentiles:"
 	for p in range(0,101,10):
-		print p, np.percentile(magnitudes_normal_train, p), np.percentile(magnitudes_normal_val, p)
+		print p, np.percentile(g.magnitudes_normal_train, p), np.percentile(g.magnitudes_normal_val, p)
 
 	multiplier = 4
 	no_samples_normal_ph = multiplier * no_seizure
@@ -575,10 +419,10 @@ def preprocess():
 	if not args.no_save_preprocessed:
 		print("Saving preprocessed data...")
 		data = {
-			'magnitudes_seizure_val': magnitudes_seizure_val,
-			'magnitudes_seizure_train': magnitudes_seizure_train,
-			'magnitudes_normal_val': magnitudes_normal_val,
-			'magnitudes_normal_train': magnitudes_normal_train,
+			'magnitudes_seizure_val': g.magnitudes_seizure_val,
+			'magnitudes_seizure_train': g.magnitudes_seizure_train,
+			'magnitudes_normal_val': g.magnitudes_normal_val,
+			'magnitudes_normal_train': g.magnitudes_normal_train,
 			'xTrain':xTrain, 
 			#'udTrain':udTrain, 
 			#'aTrain':aTrain, 
@@ -588,6 +432,41 @@ def preprocess():
 			'yVal':yVal,
 			}
 		hkl.dump(data, 'preprocessedData_16.hkl',compression="lzf")
+
+def preprocess_test_data():
+	global magnitudes_test
+	global test_counter
+
+	print("Loading and preprocessing data...")
+
+	no_files = 0
+
+	for dataset in datasets.all:
+		if dataset.enabled and not dataset.trainset:
+			no_files += int(dataset.no_files * args.debug_sub_ratio)
+
+	print "no_files", no_files
+	
+	test = read_data(data_path+'/test_1/1_','.mat',1)
+	test_magnitude = calcFFT(test[:,0],fft_width,overlap)[:,floor:ceil]
+	print "test_magnitude.shape", test_magnitude.shape
+	stft_steps = test_magnitude.shape[0]
+
+	magnitudes_test = np.zeros((no_files,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	print magnitudes_test.shape
+	test_counter = 0
+
+
+	for dataset in datasets.all:
+		if dataset.enabled and not dataset.trainset:
+			print "Read in dataset from %s ..."%(dataset.set_name)
+			nf = int(dataset.no_files * args.debug_sub_ratio)
+			read_test_data(dataset,0,nf)
+
+	process = psutil.Process(os.getpid())
+	print("Memory usage (GB): "+str(process.memory_info().rss/1e9))
+
+
 
 def load_preprocessed():
 	#global include_userdata
@@ -599,10 +478,6 @@ def load_preprocessed():
 	#global aVal
 	global udTrain
 	global udVal
-	global magnitudes_seizure_val 
-	global magnitudes_seizure_train
-	global magnitudes_normal_val
-	global magnitudes_normal_train
 	print("Loading preprocessed data....")
 	data = hkl.load('preprocessedData.hkl')
 	xTrain = data['xTrain']
@@ -610,10 +485,10 @@ def load_preprocessed():
 	#aTrain = data['aTrain']
 	xVal = data['xVal']
 	yVal = data['yVal']
-	magnitudes_seizure_val = data['magnitudes_seizure_val']
-	magnitudes_seizure_train = data['magnitudes_seizure_train']
-	magnitudes_normal_val = data['magnitudes_normal_val']
-	magnitudes_normal_train = data['magnitudes_normal_train']
+	g.magnitudes_seizure_val = data['magnitudes_seizure_val']
+	g.magnitudes_seizure_train = data['magnitudes_seizure_train']
+	g.magnitudes_normal_val = data['magnitudes_normal_val']
+	g.magnitudes_normal_train = data['magnitudes_normal_train']
 	#aVal = data['aVal']
 	# if include_userdata:
 	# 	udTrain = data['udTrain']
@@ -728,23 +603,6 @@ def predict(netSpec, xVal):
 	else:
 		return netSpec.predict(xVal)
 
-def radicalize(probs,log_decr=1.0):
-	print "probs.shape", probs.shape
-	radical = np.zeros(probs.shape,dtype=np.float32)
-	for k in range(probs.shape[0]):
-		for i in range(probs.shape[1]):
-			for j in range(i,probs.shape[1]):
-				if i!=j:
-					if probs[k][i]<probs[k][j]:
-						delta = 10 ** (math.log10(probs[k][i])-log_decr)
-						radical[k][i] -= delta
-						radical[k][j] += delta
-					else:
-						delta = 10 ** (math.log10(probs[k][j])-log_decr)
-						radical[k][j] -= delta
-						radical[k][i] += delta
-	return probs+radical
-
 def test():
 	if cfg['evaluation']['online_training']:
 		print("Start evaluation and online training...")
@@ -840,49 +698,81 @@ def test():
 	cm =  confusion_matrix(yVal,prediction)
 	print cm
 	
-	from sklearn.metrics import roc_auc_score
+	from sklearn.metrics import roc_auc_score,log_loss
 	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
+	print "log_loss", log_loss(yVal, probabilities[:,1])
 
 	print "Changing batch iterator test:"
+	from nolearn.lasagne import BatchIterator
 	netSpec.batch_iterator_test = BatchIterator(batch_size=256)
 	print "Calculating final prediction for the hour long sessions"
 
-	print "magnitudes_normal_val.shape", magnitudes_normal_val.shape
+	print "magnitudes_normal_val.shape", g.magnitudes_normal_val.shape
 	probabilities_hour = []
-	for mag_hour in magnitudes_normal_val:
+	for mag_hour in g.magnitudes_normal_val:
 		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+		patches = np.swapaxes(patches,0,2)
+		predictions_patches = netSpec.predict_proba(patches[0])
+		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		probabilities_hour.append(prediction_hour[1])
+
+	print "magnitudes_seizure_val.shape", g.magnitudes_seizure_val.shape
+	for mag_hour in g.magnitudes_seizure_val:
+		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+		patches = np.swapaxes(patches,0,2)
 		predictions_patches = netSpec.predict_proba(patches[0])
 		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
 		print prediction_hour
 		probabilities_hour.append(prediction_hour[1])
 
-	print "magnitudes_seizure_val.shape", magnitudes_seizure_val.shape
-	for mag_hour in magnitudes_seizure_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		predictions_patches = netSpec.predict_proba(patches[0])
-		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-		print prediction_hour
-		probabilities_hour.append(prediction_hour[1])
-
-	yVal_hour = np.hstack((np.zeros(magnitudes_normal_val.shape[0]),np.ones(magnitudes_seizure_val.shape[0])))
+	yVal_hour = np.hstack((np.zeros(g.magnitudes_normal_val.shape[0]),np.ones(g.magnitudes_seizure_val.shape[0])))
 	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
+	print "log_loss for the hours", log_loss(yVal_hour, probabilities_hour)
+
+	print "saving predictions to csv file" 
+	from datetime import datetime
+	patient_str = '-'.join(args.patients)
+	csv_filename = 'hours'+patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
+	print csv_filename
+	csv=open('./results/'+csv_filename, 'w+')
+	for i in range(yVal_hour.shape[0]):
+		csv.write(str(yVal_hour[i])+','+str(probabilities_hour[i])+'\n')
+	csv.close
+	
 	predictions_hour = np.round(probabilities_hour)
 	result_hour = yVal_hour==predictions_hour
 	acc_val_hour = float(np.sum(result_hour))/float(len(result_hour))
 	print "Accuracy validation for the hours: ", acc_val_hour
 
+	print "Calculating the predictions for the test files"
+	preprocess_test_data()
 
+	probabilities_test = []
+	for mag_test in magnitudes_test:
+		patches = rolling_window_ext(mag_test,(magnitude_window,ceil-floor))
+		patches = np.swapaxes(patches,0,2)
+		predictions_patches = netSpec.predict_proba(patches[0])
+		prediction_test = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		probabilities_test.append(prediction_test[1])
 
-
-
+	print "saving predictions to csv file" 
+	from datetime import datetime
+	csv_filename = patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
+	print csv_filename
+	csv=open('./results/'+csv_filename, 'w+')
+	counter = 0
+	for dataset in datasets.all:
+		if dataset.enabled and not dataset.trainset:
+			for i in range(int(dataset.no_files * args.debug_sub_ratio)):
+				filename = dataset.base_name+str(i+1)+'.mat'
+				csv.write(filename+','+str(probabilities_test[counter+i])+'\n')
+	csv.close
 
 
 
 data_path = args.data_path
 
-
 files_per_hour = 6
-
 
 #is_train_index = get_train_val_split(size)
 
@@ -913,10 +803,11 @@ if args.mode=="single-channel":
 else:
 	no_channels = args.no_channels
 
+import batch_iterators
 if args.no_training:
-	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=BI_train(batch_size=128),batch_iterator_test=BI_test(batch_size=128))
+	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train(128),batch_iterator_test=batch_iterators.BI_test(128))
 else:
-	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=BI_train(batch_size=128),batch_iterator_test=BI_test(batch_size=128))	
+	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train(128),batch_iterator_test=batch_iterators.BI_test(128))	
 
 if args.no_training:
 	netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)

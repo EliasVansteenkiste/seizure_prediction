@@ -7,11 +7,11 @@ import math
 from itertools import izip
 
 
-model_filename = "run1.pickle"
+model_filename = "run3.pickle"
 config_filename = 'config.yml'
 data_path = '/home/eavsteen/seizure_detection/data'
-target_gpu = 'gpu0'
-user = 'patient1'
+target_gpu = 'gpu2'
+user = 'patient2'
 common_args = ['--debug-sub-ratio=1', '--model-filename='+model_filename,'--config-filename='+config_filename, '--no-channels=1', '--target-gpu='+target_gpu, '--data-path='+data_path, '--patients='+user]
 
 

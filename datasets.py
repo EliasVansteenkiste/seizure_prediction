@@ -18,7 +18,7 @@ class DataSet:
 		self.enabled = True
 		self.debug_sub_ratio = 1
 	def __str__(self):
-		return "name: %s, type: %s, user: %s, hand: %s, files: %d"%(self.session_name, self.type, self.user, self.hand, self.noSamples())
+		return "base_name: %s, set_name: %s, user: %s, trainset: %d, files: %d"%(self.base_name, self.set_name, self.user, self.trainset, self.no_files)
 	def noSamples(self):
 		return len(self.fileIndices())
 	def fileIndices(self):

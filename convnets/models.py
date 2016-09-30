@@ -361,3 +361,102 @@ def net9(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
     )
     return net
 
+he_norm = HeNormal(gain='relu')
+def wideResNet0(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+    '''
+    Adapted from https://github.com/Lasagne/Recipes/tree/master/papers/deep_residual_learning.
+    Tweaked to be consistent with 'Identity Mappings in Deep Residual Networks', Kaiming He et al. 2016 (https://arxiv.org/abs/1603.05027)
+    And 'Wide Residual Networks', Sergey Zagoruyko, Nikos Komodakis 2016 (http://arxiv.org/pdf/1605.07146v1.pdf)
+    Depth = 6n + 2
+    '''
+    #n_filters = {0:16, 1:16*k, 2:32*k, 3:64*k}
+    n_filters = {0:64, 1:64, 2:64, 3:64}
+
+    # create a residual learning building block with two stacked 3x3 convlayers as in paper
+    def residual_block(l, increase_dim=False, projection=True, first=False, filters=16, nonlinearity=nonlinearities.very_leaky_rectify, prefix='res'):
+        if increase_dim:
+            first_stride = (2,2)
+        else:
+            first_stride = (1,1)
+
+        if first:
+            # hacky solution to keep layers correct
+            bn_pre_relu = l
+        else:
+            # contains the BN -> ReLU portion, steps 1 to 2
+            bn_pre_conv = BatchNormLayer(l,name=prefix+'_bn')
+            bn_pre_relu = NonlinearityLayer(bn_pre_conv, nonlinearity,name=prefix+'_nonlin')
+
+        # contains the weight -> BN -> ReLU portion, steps 3 to 5
+        conv_1 = batch_norm(ConvLayer(bn_pre_relu, num_filters=filters, filter_size=(3,3), stride=first_stride, nonlinearity=nonlinearity, pad='same', W=he_norm),name=prefix+'_conv1')
+
+        dropout = DropoutLayer(conv_1, p=0.5,name=prefix+'_dropout')
+
+        # contains the last weight portion, step 6
+        conv_2 = ConvLayer(dropout, num_filters=filters, filter_size=(3,3), stride=(1,1), nonlinearity=None, pad='same', W=he_norm,name=prefix+'_conv2')
+
+        # add shortcut connections
+        if increase_dim:
+            # projection shortcut, as option B in paper
+            projection = ConvLayer(l, num_filters=filters, filter_size=(1,1), stride=(2,2), nonlinearity=None, pad='same', b=None, name=prefix+'_projection')
+            block = ElemwiseSumLayer([conv_2, projection], name=prefix+'_sum')
+
+        elif first:
+            # projection shortcut, as option B in paper
+            projection = ConvLayer(l, num_filters=filters, filter_size=(1,1), stride=(1,1), nonlinearity=None, pad='same', b=None, name=prefix+'_projection')
+            block = ElemwiseSumLayer([conv_2, projection], name=prefix+'_sum')
+
+        else:
+            block = ElemwiseSumLayer([conv_2, l], name=prefix+'_sum')
+
+        return block
+
+    # Building the network
+    l_in = InputLayer(shape=(None, n_channels, width, height),name='input')
+
+
+    # first layer, output is 16 x 64 x 64
+    l = batch_norm(ConvLayer(l_in, num_filters=n_filters[0], filter_size=(3,3), stride=(1,1), nonlinearity=nonlinearities.rectify, pad='same', W=he_norm),name='batch_norm1')
+
+
+    # first stack of residual blocks, output is 32 x 64 x 64
+    l = residual_block(l, first=True, filters=n_filters[1], prefix='res0_')
+    for idx in range(1,n):
+        l = residual_block(l, filters=n_filters[1], prefix='res1_'+str(idx))
+
+    # second stack of residual blocks, output is 64 x 32 x 32
+    l = residual_block(l, increase_dim=True, filters=n_filters[2], prefix='res3_')
+    for idx in range(1,(n+2)):
+        l = residual_block(l, filters=n_filters[2], prefix='res4_'+str(idx))
+
+
+    # third stack of residual blocks, output is 128 x 16 x 16
+    l = residual_block(l, increase_dim=True, filters=n_filters[3], prefix='res5_')
+    for idx in range(1,(n+2)):
+        l = residual_block(l, filters=n_filters[3], prefix='res6_'+str(idx))
+
+
+    bn_post_conv = BatchNormLayer(l, name='bn_post_conv')
+    bn_post_relu = NonlinearityLayer(bn_post_conv, nonlinearity, name='post_conv_nonlin')
+
+    # average pooling
+    layer = Conv2DLayer(bn_post_relu, nonlinearity=None, filter_size=(3,3), pad=1, num_filters=n_output, name='last_conv')
+    layer = GlobalPoolLayer(layer, name='global_pool')
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax, name='softmax')
+
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=5),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+
+    return net
+
