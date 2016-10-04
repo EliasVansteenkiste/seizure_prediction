@@ -335,7 +335,7 @@ def preprocess():
 	for p in range(0,101,10):
 		print p, np.percentile(g.magnitudes_normal_train, p), np.percentile(g.magnitudes_normal_val, p)
 
-	multiplier = 4
+	multiplier = 1
 	no_samples_normal_ph = multiplier * no_seizure
 	no_samples_seizure_ph = multiplier * no_normal
 	size = no_normal * no_samples_normal_ph + no_seizure * no_samples_seizure_ph

@@ -5,7 +5,6 @@ import global_vars as g
 g.init()
 import sys
 import os
-import datetime
 import time
 import math
 import matplotlib
@@ -15,6 +14,7 @@ from matplotlib import gridspec
 
 from tools.utils import calcFFT, rolling_window_ext
 from tools.analyze import read_data_1h, read_data
+from fractions import gcd
 
 import numpy as np
 import hickle as hkl
@@ -30,6 +30,7 @@ import psutil
 import scipy
 
 from sklearn.base import clone
+from datetime import datetime
 
 import datasets
 
@@ -37,16 +38,16 @@ import datasets
 parser = argparse.ArgumentParser(description='Preprocess/Train/Validate all data.')
 parser.add_argument('--data-path', dest='data_path', action='store', default="/home/eavsteen/seizure_detection/data",
                    help='top level path of data (default: /home/eavsteen/seizure_detection/data)')
-parser.add_argument('--model-filename', dest='model_filename', action='store',
-                   default="netSpec.pickle",
-                   help='save/read the model parameters to/from the filename given (default: netSpec.pickle)')
+parser.add_argument('--model-path', dest='model_path', action='store',
+                   default="/home/eavsteen/seizure_detection/vault",
+                   help='save/read the model parameters to/from the filename given (default: /home/eavsteen/seizure_detection/vault)')
 parser.add_argument('--config-filename', dest='config_filename', action='store',
                    default="config.yml",
                    help='read the configuration parameters from the filename given (default: config.yml)')
 parser.add_argument('--no-preprocessing', dest='no_preprocessing', action='store_true', default=False,
                    help='skip preprocessing. load preprocessed data from file (default: false)')
-parser.add_argument('--no-save-preprocessed', dest='no_save_preprocessed', action='store_true', default=False,
-                   help='don\'t save the data after preprocessing. saves some time (default: false)')
+parser.add_argument('--save-preprocessed', dest='save_preprocessed', action='store_true', default=False,
+                   help='save the data after preprocessing. saves some time (default: false)')
 parser.add_argument('--no-training', dest='no_training', action='store_true',  default=False,
                    help='skip training. load trained net from file (default: false)')
 parser.add_argument('--no-shuffle-before-split', dest='shuffle_before_split', action='store_false',  default=True,
@@ -75,6 +76,9 @@ parser.add_argument('--mode', dest='mode', action='store', default="None",
                    help='single-channel/dual-channel/none (default: none)')
 parser.add_argument('--patients', dest='patients', nargs='+', default=['patient0'],
 					help='the target patients')
+parser.add_argument('--no-predict-test', dest='no_predict_test', action='store_true', default=False,
+                   help='do not calculate the predictions for the test set. (default: false)')
+
 
 g.args = parser.parse_args()
 args = g.args
@@ -82,7 +86,7 @@ args = g.args
 print "Command line arguments:", args
 print "Git reference: ",
 os.system("git show-ref HEAD")
-print "Timestamp:", datetime.datetime.now()
+print "Timestamp:", datetime.now()
 print "Hostname:", platform.node()
 
 import theano.sandbox.cuda
@@ -335,38 +339,51 @@ def preprocess():
 	for p in range(0,101,10):
 		print p, np.percentile(g.magnitudes_normal_train, p), np.percentile(g.magnitudes_normal_val, p)
 
-	multiplier = 4
-	no_samples_normal_ph = multiplier * no_seizure
-	no_samples_seizure_ph = multiplier * no_normal
-	size = no_normal * no_samples_normal_ph + no_seizure * no_samples_seizure_ph
+	#Construct training vector
+	train_multiplier = 1
+	gcd_ = gcd(no_normal,no_seizure)
+	samplesph_normal = train_multiplier * no_seizure / gcd_
+	samplesph_seizure = train_multiplier * no_normal / gcd_
+	size_train = no_normal_train * samplesph_normal + no_seizure_train * samplesph_seizure
 	
-	print "no_normal", no_normal
-	print "no_seizure", no_seizure
-	print "no_samples_normal_ph", no_samples_normal_ph
-	print "no_samples_seizure_ph", no_samples_seizure_ph
-	
-	magnitudes = np.random.rand(size)
-	labels = np.hstack((np.zeros(size/2),np.ones(size/2)))	
+	magnitudes = np.hstack((np.arange(size_train/2),np.arange(size_train/2)))
+	labels = np.hstack((np.zeros(size_train/2),np.ones(size_train/2)))
 	np.random.shuffle(labels)
 
-	print "size", size
-
-	print "no_normal", no_normal
-	print "no_seizure", no_seizure
-	print "no_samples_normal_ph", no_samples_normal_ph
-	print "no_samples_seizure_ph", no_samples_seizure_ph
-	
-
-	labels = labels.astype(np.int32)
-	magnitudes = magnitudes.astype(np.float32)
+	yTrain = labels.astype(np.int32)
+	xTrain = magnitudes.astype(np.float32)
 
 	print("Histogram:")
-	print np.bincount(labels)
+	print np.bincount(yTrain)
 
-	print "magnitudes.shape", magnitudes.shape
-	print "labels.shape", labels.shape
+	print "yTrain.shape", yTrain.shape
+	print "xTrain.shape", xTrain.shape
 
+	#Construct validation vector
+	val_mult = 3
+	gcd_ = gcd(no_normal_val,no_seizure_val)
+	samplesph_normal = val_mult * no_seizure_val / gcd_
+	samplesph_seizure = val_mult * no_normal_val / gcd_
+	size_val = no_normal_val * samplesph_normal + no_seizure_val * samplesph_seizure
+	
+	magnitudes = np.hstack((np.arange(size_val/2)%no_normal_val,np.arange(size_val/2)%no_seizure_val))
+	labels = np.hstack((np.zeros(size_val/2),np.ones(size_val/2)))	
 
+	yVal = labels.astype(np.int32)
+	xVal = magnitudes.astype(np.float32)
+
+	print("Histogram:")
+	print np.bincount(yVal)
+
+	print "yTrain.shape", yTrain.shape
+	print "xTrain.shape", xVal.shape
+
+	print "xVal.shape", xVal.shape
+	print "yVal.shape", yVal.shape
+	xVal = np.vstack((xVal,yVal))
+	xVal = np.swapaxes(xVal,0,1)
+
+	size = size_val +size_train
 	no_val = int(math.floor(args.chosen_validation_ratio * size))
 	no_train = size-no_val
 	assert no_train + no_val == size
@@ -374,36 +391,6 @@ def preprocess():
 	if abs(no_val/float(size) - args.chosen_validation_ratio) > 0.02:
 		print "WARNING: validation ratio (%g) differs from expected value (%g)"%(no_val/float(size), args.chosen_validation_ratio)
 	
-	xTrain = magnitudes[:no_train]
-	udTrain = []
-	if include_userdata:
-		udTrain = userdata[:no_train]
-	yTrain = labels[:no_train]
-
-	xVal = magnitudes[no_train:]
-
-	udVal = []
-	if include_userdata:
-		udVal = userdata[no_train:]
-	yVal = labels[no_train:]
-
-	print "xVal.shape", xVal.shape
-	print "yVal.shape", yVal.shape
-	xVal = np.vstack((xVal,yVal))
-	xVal = np.swapaxes(xVal,0,1)
-	#aVal = analysis_datas[no_train:]
-
-
-	# print("Shuffling data...")
-	# a = np.arange(xTrain.shape[0])
-	# np.random.shuffle(a)
-	# xTrain = xTrain[a]
-	# if include_userdata:
-	# 	udTrain = udTrain[a]
-	# yTrain = yTrain[a]
-
-	# inorder to be able to release magnitudes array
-	# xVal = np.copy(xVal)
 
 	del magnitudes
 	gc.collect()
@@ -416,7 +403,7 @@ def preprocess():
 	assert xTrain.shape[0] == yTrain.shape[0]
 	assert xVal.shape[0] == yVal.shape[0]
 
-	if not args.no_save_preprocessed:
+	if args.save_preprocessed:
 		print("Saving preprocessed data...")
 		data = {
 			'magnitudes_seizure_val': g.magnitudes_seizure_val,
@@ -431,7 +418,7 @@ def preprocess():
 			#'udVal':udVal, 
 			'yVal':yVal,
 			}
-		hkl.dump(data, 'preprocessedData_16.hkl',compression="lzf")
+		hkl.dump(data, 'preprocessedData.hkl',compression="lzf")
 
 def preprocess_test_data():
 	global magnitudes_test
@@ -512,9 +499,11 @@ def train(netSpec):
 	netSpec.fit(xTrain, yTrain)
 
 	if not args.no_save_model:
+		patient_str = '-'.join(args.patients)
+		model_filename = patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.pickle'
 		print("Saving model...")
 		model = {'model':netSpec.get_all_params_values()}
-		with open(args.model_filename, 'w') as f:
+		with open(args.model_path+'/'+model_filename, 'w') as f:
 			pickle.dump(model, f)
 	return netSpec 
 
@@ -604,51 +593,16 @@ def predict(netSpec, xVal):
 		return netSpec.predict(xVal)
 
 def test():
-	if cfg['evaluation']['online_training']:
-		print("Start evaluation and online training...")
-		print("offline_validation...")
+
+	print("Validating...")
+	if include_userdata:
+		prediction = predict(netSpec, {'sensors':xVal,'user':udVal})
+		probabilities = netSpec.predict_proba({'sensors':xVal,'user':udVal})
+		print "probabilities.shape", probabilities.shape
+	else:
 		prediction = predict(netSpec, xVal)
 		probabilities = netSpec.predict_proba(xVal)
-		print("Performance_on_relevant_data")
-		result = yVal==prediction
-		faults = yVal!=prediction
-		acc_val = float(np.sum(result))/float(len(result))
-		print "Accuracy_validation: ", acc_val
-		print "Error_rate_(%): ", 100*(1-acc_val)
-		relTrain = yTrain != label_values.noise
-		relVal = yVal != label_values.noise
-		print 'Ratio_validation_relevant_data:', float(np.count_nonzero(relVal)) / (np.count_nonzero(relVal) + np.count_nonzero(relTrain))
-		rresult = yVal[relVal]==prediction[relVal]
-		acc_val_relevant = float(np.sum(rresult))/float(len(rresult))
-		print "Accuracy_for_relevant_data: ", acc_val_relevant
-		print "Error_rate_for_relevant_data_(%): ", 100*(1-acc_val_relevant)
-
-		prediction = np.zeros((xVal.shape[0]),dtype=np.int32)
-		probabilities = np.zeros((xVal.shape[0],2),dtype=np.float32)
-		batch_size = 128
-
-		print "xVal.shape[0]", xVal.shape[0]
-		for i in range(0,xVal.shape[0]-batch_size,batch_size):
-			fragment_xVal = xVal[i:i+batch_size]
-			fragment_prediction = predict(netSpec, fragment_xVal)
-			prediction[i:i+batch_size] = fragment_prediction
-			fragment_probabilities = netSpec.predict_proba(fragment_xVal)
-			probabilities[i:i+batch_size] = fragment_probabilities
-			new_fragment_probabilities = radicalize(fragment_probabilities)
-			print "fragment_xVal.shape", fragment_xVal.shape
-			print "new_fragment_probabilities", new_fragment_probabilities
-
-			netSpec.partial_fit(fragment_xVal,new_fragment_probabilities)
-	else:	
-		print("Validating...")
-		if include_userdata:
-			prediction = predict(netSpec, {'sensors':xVal,'user':udVal})
-			probabilities = netSpec.predict_proba({'sensors':xVal,'user':udVal})
-			print "probabilities.shape", probabilities.shape
-		else:
-			prediction = predict(netSpec, xVal)
-			probabilities = netSpec.predict_proba(xVal)
-			print "probabilities.shape", probabilities.shape
+		print "probabilities.shape", probabilities.shape
 
 	print("Showing last 30 test samples..")
 	print("Predictions:")
@@ -662,36 +616,7 @@ def test():
 	print "Accuracy validation: ", acc_val
 	print "Error rate (%): ", 100*(1-acc_val)
 	#print np.nonzero(faults)
-	
-	print "yVal", yVal
-	
-	if args.plot_prob_dist:
-		rrprobs = probabilities[relVal]
-		rrprobs_idx = prediction[relVal]
-		rrprobs = rrprobs[np.arange(rrprobs_idx.size),rrprobs_idx]
-		rrprobs_correct = rrprobs[rresult] 
-		rrprobs_wrong = rrprobs[np.invert(rresult)]
 
-		numBins = 40
-		p1 = plt.hist(rrprobs_correct,numBins,color='green',alpha=0.5, label="Correct samples")
-		p2 = plt.hist(rrprobs_wrong,numBins,color='red',alpha=0.5, label="Wrong samples")
-		max_bin_size = max(max(p1[0]),max(p2[0]))
-		plt.plot((np.median(rrprobs_correct), np.median(rrprobs_correct)),(0, max_bin_size), 'g-', label="Median prob for correct samples")
-		plt.plot((np.median(rrprobs_wrong), np.median(rrprobs_wrong)),(0, max_bin_size), 'r-', label="Median prob for false samples")
-		plt.title("Distribution of predicted probabilities")
-		plt.legend(loc='upper center', numpoints=1, bbox_to_anchor=(0.5,-0.05), ncol=2, fancybox=True, shadow=True)
-		dest_str = ""
-		for session in args.include_session:
-			dest_str = dest_str+'_'+session
-		plt.savefig('dist_proba'+dest_str+'.png', bbox_inches='tight') 
-		plt.show()
-
-	# selVal = aVal['saturated']
-	# tresult = yVal[selVal]==prediction[selVal]
-	# print "Ratio selection:", float(np.count_nonzero(selVal))/len(xVal)
-	# acc_val_sel = float(np.sum(tresult))/float(len(tresult)+0.0001)
-	# print "Accuracy for selection", acc_val_sel
-	# print "Error rate for selection val data (%): ", 100*(1-acc_val_sel)
 
 
 	from sklearn.metrics import confusion_matrix
@@ -700,7 +625,7 @@ def test():
 	
 	from sklearn.metrics import roc_auc_score,log_loss
 	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
-	print "log_loss", log_loss(yVal, probabilities[:,1])
+	print "log_loss:", log_loss(yVal, probabilities[:,1])
 
 	print "Changing batch iterator test:"
 	from nolearn.lasagne import BatchIterator
@@ -727,10 +652,9 @@ def test():
 
 	yVal_hour = np.hstack((np.zeros(g.magnitudes_normal_val.shape[0]),np.ones(g.magnitudes_seizure_val.shape[0])))
 	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
-	print "log_loss for the hours", log_loss(yVal_hour, probabilities_hour)
+	print "log_loss for the hours:", log_loss(yVal_hour, probabilities_hour)
 
 	print "saving predictions to csv file" 
-	from datetime import datetime
 	patient_str = '-'.join(args.patients)
 	csv_filename = 'hours'+patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
 	print csv_filename
@@ -744,29 +668,29 @@ def test():
 	acc_val_hour = float(np.sum(result_hour))/float(len(result_hour))
 	print "Accuracy validation for the hours: ", acc_val_hour
 
-	print "Calculating the predictions for the test files"
-	preprocess_test_data()
+	if not args.no_predict_test:
+		print "Calculating the predictions for the test files"
+		preprocess_test_data()
 
-	probabilities_test = []
-	for mag_test in magnitudes_test:
-		patches = rolling_window_ext(mag_test,(magnitude_window,ceil-floor))
-		patches = np.swapaxes(patches,0,2)
-		predictions_patches = netSpec.predict_proba(patches[0])
-		prediction_test = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-		probabilities_test.append(prediction_test[1])
+		probabilities_test = []
+		for mag_test in magnitudes_test:
+			patches = rolling_window_ext(mag_test,(magnitude_window,ceil-floor))
+			patches = np.swapaxes(patches,0,2)
+			predictions_patches = netSpec.predict_proba(patches[0])
+			prediction_test = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+			probabilities_test.append(prediction_test[1])
 
-	print "saving predictions to csv file" 
-	from datetime import datetime
-	csv_filename = patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
-	print csv_filename
-	csv=open('./results/'+csv_filename, 'w+')
-	counter = 0
-	for dataset in datasets.all:
-		if dataset.enabled and not dataset.trainset:
-			for i in range(int(dataset.no_files * args.debug_sub_ratio)):
-				filename = dataset.base_name+str(i+1)+'.mat'
-				csv.write(filename+','+str(probabilities_test[counter+i])+'\n')
-	csv.close
+		print "saving predictions to csv file" 
+		csv_filename = patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
+		print csv_filename
+		csv=open('./results/'+csv_filename, 'w+')
+		counter = 0
+		for dataset in datasets.all:
+			if dataset.enabled and not dataset.trainset:
+				for i in range(int(dataset.no_files * args.debug_sub_ratio)):
+					filename = dataset.base_name+str(i+1)+'.mat'
+					csv.write(filename+','+str(probabilities_test[counter+i])+'\n')
+		csv.close
 
 
 
@@ -805,9 +729,9 @@ else:
 
 import batch_iterators
 if args.no_training:
-	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train(128),batch_iterator_test=batch_iterators.BI_test(128))
+	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_balanced(128),batch_iterator_test=batch_iterators.BI_test_balanced(128))
 else:
-	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train(128),batch_iterator_test=batch_iterators.BI_test(128))	
+	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_balanced(128),batch_iterator_test=batch_iterators.BI_test_balanced(128))	
 
 if args.no_training:
 	netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)

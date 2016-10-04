@@ -48,8 +48,8 @@ for line in lines:
 print
 acc = "Accuracy validation"
 auc = "auc"
-
+loss = "log_loss"
 for line in lines:
-    if acc in line or auc in line:
+    if acc in line or auc in line or loss in line:
         print line, 
 
