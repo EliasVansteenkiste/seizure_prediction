@@ -13,6 +13,9 @@ parser = argparse.ArgumentParser(description='Process log file.')
 parser.add_argument('--filename', dest='filename', action='store',
                    default="test.log",
                    help='read and process the log from the filename given (default: test.log)')
+parser.add_argument('--detail', dest='details', action='store_true',
+                   default=False,
+                   help='give more details such as csv filenames (default: False)')
 args = parser.parse_args()
 
 
@@ -46,10 +49,14 @@ for line in lines:
         print "No. learnable parameters:", words[4]
         found_parameters = True
 print
-acc = "Accuracy validation"
-auc = "auc"
-loss = "log_loss"
+patterns = ["Accuracy validation", "auc", "log_loss"]
+details = ['.csv']
+if args.details:
+    patterns = patterns + details
+
 for line in lines:
-    if acc in line or auc in line or loss in line:
-        print line, 
+    for p in patterns:
+        if p in line:
+            print line,
+            break
 

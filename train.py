@@ -595,15 +595,41 @@ def predict(netSpec, xVal):
 def test():
 
 	print("Validating...")
-	if include_userdata:
-		prediction = predict(netSpec, {'sensors':xVal,'user':udVal})
-		probabilities = netSpec.predict_proba({'sensors':xVal,'user':udVal})
-		print "probabilities.shape", probabilities.shape
-	else:
-		prediction = predict(netSpec, xVal)
-		probabilities = netSpec.predict_proba(xVal)
-		print "probabilities.shape", probabilities.shape
+	print "Changing batch iterator test:"
+	from nolearn.lasagne import BatchIterator
+	netSpec.batch_iterator_test = BatchIterator(batch_size=128)
 
+	print "Calculating final prediction for the hour long sessions"
+	print "magnitudes_normal_val.shape", g.magnitudes_normal_val.shape
+	probabilities_hour = []
+	probabilities_normal = []
+	for mag_hour in g.magnitudes_normal_val:
+		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+		patches = np.swapaxes(patches,0,2)
+		predictions_patches = netSpec.predict_proba(patches[0])
+		probabilities_normal.append(predictions_patches)
+		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		probabilities_hour.append(prediction_hour[1])
+
+	probabilities_seizure = []
+	print "magnitudes_seizure_val.shape", g.magnitudes_seizure_val.shape
+	for mag_hour in g.magnitudes_seizure_val:
+		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+		patches = np.swapaxes(patches,0,2)
+		predictions_patches = netSpec.predict_proba(patches[0])
+		probabilities_seizure.append(predictions_patches)
+		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		probabilities_hour.append(prediction_hour[1])
+
+	probabilities_normal = np.stack(probabilities_normal)
+	probabilities_seizure = np.stack(probabilities_seizure)
+	probabilities_normal = np.reshape(probabilities_normal,(-1,2))
+	probabilities_seizure = np.reshape(probabilities_seizure,(-1,2))	
+	print "probabilities_normal", probabilities_normal.shape
+	print "probabilities_seizure", probabilities_seizure.shape	
+	yVal = np.hstack((np.zeros(len(probabilities_normal)),np.ones(len(probabilities_seizure))))
+	probabilities = np.vstack((probabilities_normal,probabilities_seizure))
+	prediction = np.argmax(probabilities,axis=1)
 	print("Showing last 30 test samples..")
 	print("Predictions:")
 	print(prediction[-30:])
@@ -615,40 +641,14 @@ def test():
 	acc_val = float(np.sum(result))/float(len(result))
 	print "Accuracy validation: ", acc_val
 	print "Error rate (%): ", 100*(1-acc_val)
-	#print np.nonzero(faults)
-
-
-
 	from sklearn.metrics import confusion_matrix
 	cm =  confusion_matrix(yVal,prediction)
 	print cm
-	
 	from sklearn.metrics import roc_auc_score,log_loss
+	print probabilities[:,1].shape
+	print yVal.shape
 	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
 	print "log_loss:", log_loss(yVal, probabilities[:,1])
-
-	print "Changing batch iterator test:"
-	from nolearn.lasagne import BatchIterator
-	netSpec.batch_iterator_test = BatchIterator(batch_size=256)
-	print "Calculating final prediction for the hour long sessions"
-
-	print "magnitudes_normal_val.shape", g.magnitudes_normal_val.shape
-	probabilities_hour = []
-	for mag_hour in g.magnitudes_normal_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		patches = np.swapaxes(patches,0,2)
-		predictions_patches = netSpec.predict_proba(patches[0])
-		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-		probabilities_hour.append(prediction_hour[1])
-
-	print "magnitudes_seizure_val.shape", g.magnitudes_seizure_val.shape
-	for mag_hour in g.magnitudes_seizure_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		patches = np.swapaxes(patches,0,2)
-		predictions_patches = netSpec.predict_proba(patches[0])
-		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-		print prediction_hour
-		probabilities_hour.append(prediction_hour[1])
 
 	yVal_hour = np.hstack((np.zeros(g.magnitudes_normal_val.shape[0]),np.ones(g.magnitudes_seizure_val.shape[0])))
 	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
@@ -729,9 +729,9 @@ else:
 
 import batch_iterators
 if args.no_training:
-	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_balanced(128),batch_iterator_test=batch_iterators.BI_test_balanced(128))
+	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_bal_complete(16),batch_iterator_test=batch_iterators.BI_test_bal_complete(16))
 else:
-	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_balanced(128),batch_iterator_test=batch_iterators.BI_test_balanced(128))	
+	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_bal_complete(16),batch_iterator_test=batch_iterators.BI_test_bal_complete(16))	
 
 if args.no_training:
 	netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)

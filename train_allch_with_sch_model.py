@@ -594,119 +594,112 @@ def predict(netSpec, xVal):
 
 def test():
 
-	print("Validating...")
-	if include_userdata:
-		prediction = predict(netSpec, {'sensors':xVal,'user':udVal})
-		probabilities = netSpec.predict_proba({'sensors':xVal,'user':udVal})
-		print "probabilities.shape", probabilities.shape
-	else:
-		raw_probabilities = netSpec.predict_proba(xVal)
-		print "raw_probabilities.shape", raw_probabilities.shape
-		probabilities = np.empty((raw_probabilities.shape[0]/args.no_channels,raw_probabilities.shape[1]))
-		for i in range(raw_probabilities.shape[0]/args.no_channels):
-			probabilities[i] = np.sum(raw_probabilities[i*args.no_channels:(i+1)*args.no_channels],axis=0)/args.no_channels
-		print "probabilities.shape", probabilities.shape
-		prediction = np.argmax(probabilities,axis=1)
-
-
-	print("Showing last 30 test samples..")
-	print("Predictions:")
-	print(prediction[-30:])
-	print("Ground Truth:")
-	print(yVal[-30:])
-	print("Performance on relevant data")
-	print 'yVal.shape', yVal.shape
-	print 'prediction.shape', prediction.shape
-	result = yVal==prediction
-	faults = yVal!=prediction
-	acc_val = float(np.sum(result))/float(len(result))
-	print "Accuracy validation: ", acc_val
-	print "Error rate (%): ", 100*(1-acc_val)
-	#print np.nonzero(faults)
-
-	from sklearn.metrics import confusion_matrix
-	cm =  confusion_matrix(yVal,prediction)
-	print cm
-	
-	from sklearn.metrics import roc_auc_score,log_loss
-	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
-	print "log_loss:", log_loss(yVal, probabilities[:,1])
-
-	print "Changing batch iterator test:"
-	from nolearn.lasagne import BatchIterator
-	netSpec.batch_iterator_test = BatchIterator(batch_size=256)
-	print "Calculating final prediction for the hour long sessions"
-
-	print "magnitudes_normal_val.shape", g.magnitudes_normal_val.shape
-	probabilities_hour = []
-	for mag_hour in g.magnitudes_normal_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		rpatches = np.reshape(patches, (patches.shape[0]*patches.shape[1],patches.shape[2],patches.shape[3],patches.shape[4]))
-		print "patches.shape", rpatches.shape
-		predictions_patches = netSpec.predict_proba(rpatches)
-		print "predictions_patches.shape", predictions_patches.shape		
-		probabilities = np.empty((patches.shape[1],2))
-		for i in range(patches.shape[1]):
-			probabilities[i] = np.sum(predictions_patches[i*args.no_channels:(i+1)*args.no_channels],axis=0)/args.no_channels
-		prediction_hour = np.sum(probabilities,axis=0)/probabilities.shape[0]
-		probabilities_hour.append(prediction_hour[1])
-
-	print "magnitudes_seizure_val.shape", g.magnitudes_seizure_val.shape
-	for mag_hour in g.magnitudes_seizure_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
-		rpatches = np.reshape(patches, (patches.shape[0]*patches.shape[1],patches.shape[2],patches.shape[3],patches.shape[4]))
-		print "patches.shape", rpatches.shape
-		predictions_patches = netSpec.predict_proba(rpatches)
-		print "predictions_patches.shape", predictions_patches.shape		
-		probabilities = np.empty((patches.shape[1],2))
-		for i in range(patches.shape[1]):
-			probabilities[i] = np.sum(predictions_patches[i*args.no_channels:(i+1)*args.no_channels],axis=0)/args.no_channels
-		prediction_hour = np.sum(probabilities,axis=0)/probabilities.shape[0]
-		probabilities_hour.append(prediction_hour[1])
-
-	yVal_hour = np.hstack((np.zeros(g.magnitudes_normal_val.shape[0]),np.ones(g.magnitudes_seizure_val.shape[0])))
-	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
-	print "log_loss for the hours:", log_loss(yVal_hour, probabilities_hour)
-
-	print "saving predictions to csv file" 
-	patient_str = '-'.join(args.patients)
-	csv_filename = 'hours'+patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
-	print csv_filename
-	csv=open('./results/'+csv_filename, 'w+')
-	for i in range(yVal_hour.shape[0]):
-		csv.write(str(yVal_hour[i])+','+str(probabilities_hour[i])+'\n')
-	csv.close
-	
-	predictions_hour = np.round(probabilities_hour)
-	result_hour = yVal_hour==predictions_hour
-	acc_val_hour = float(np.sum(result_hour))/float(len(result_hour))
-	print "Accuracy validation for the hours: ", acc_val_hour
-
 	if not args.no_predict_test:
-		print "Calculating the predictions for the test files"
+		print "Reading in the test files before starting the loop"
 		preprocess_test_data()
 
-		probabilities_test = []
-		for mag_test in magnitudes_test:
-			patches = rolling_window_ext(mag_test,(magnitude_window,ceil-floor))
-			print "patches.shape", patches.shape			
-			rpatches = np.reshape(patches, (patches.shape[0]*patches.shape[1],patches.shape[2],patches.shape[3],patches.shape[4]))
-			print "rpatches.shape", rpatches.shape
-			predictions_patches = netSpec.predict_proba(rpatches)
-			prediction_test = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-			probabilities_test.append(prediction_test[1])
+	print("Validating...")
+	for ch in range(args.no_channels):
+		print 'Prediction for channel', ch
+		print "Changing batch iterator test:"
+		from batch_iterators import BI_test_sch_sch
+		netSpec.batch_iterator_test = BI_test_sch_sch(batch_size=256,channel=ch)
+		if include_userdata:
+			prediction = predict(netSpec, {'sensors':xVal,'user':udVal})
+			probabilities = netSpec.predict_proba({'sensors':xVal,'user':udVal})
+			print "probabilities.shape", probabilities.shape
+		else:
+			prediction = predict(netSpec, xVal)
+			print "xVal.shape", xVal.shape
+			probabilities = netSpec.predict_proba(xVal)
+			print "probabilities.shape", probabilities.shape
+
+
+		print("Showing last 30 test samples..")
+		print("Predictions:")
+		print(prediction[-30:])
+		print("Ground Truth:")
+		print(yVal[-30:])
+		print("Performance on relevant data")
+		print 'yVal.shape', yVal.shape
+		print 'prediction.shape', prediction.shape
+		result = yVal==prediction
+		faults = yVal!=prediction
+		acc_val = float(np.sum(result))/float(len(result))
+		print "Accuracy validation: ", acc_val
+		print "Error rate (%): ", 100*(1-acc_val)
+		#print np.nonzero(faults)
+
+		from sklearn.metrics import confusion_matrix
+		cm =  confusion_matrix(yVal,prediction)
+		print cm
+		
+		from sklearn.metrics import roc_auc_score,log_loss
+		print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
+		print "log_loss:", log_loss(yVal, probabilities[:,1])
+
+		print "Changing batch iterator test:"
+		from nolearn.lasagne import BatchIterator
+		netSpec.batch_iterator_test = BatchIterator(batch_size=256)
+		print "Calculating final prediction for the hour long sessions"
+
+
+		print "magnitudes_normal_val.shape", g.magnitudes_normal_val.shape
+		probabilities_hour = []
+		for mag_hour in g.magnitudes_normal_val:
+			m_hour = mag_hour[ch]
+			patches = rolling_window_ext(m_hour,(magnitude_window,ceil-floor))
+			predictions_patches = netSpec.predict_proba(patches)
+			prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+			probabilities_hour.append(prediction_hour[1])
+
+		print "magnitudes_seizure_val.shape", g.magnitudes_seizure_val.shape
+		for mag_hour in g.magnitudes_seizure_val:
+			m_hour = mag_hour[ch]
+			patches = rolling_window_ext(m_hour,(magnitude_window,ceil-floor))
+			predictions_patches = netSpec.predict_proba(patches)
+			prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+			probabilities_hour.append(prediction_hour[1])
+
+		yVal_hour = np.hstack((np.zeros(g.magnitudes_normal_val.shape[0]),np.ones(g.magnitudes_seizure_val.shape[0])))
+		print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
+		print "log_loss for the hours:", log_loss(yVal_hour, probabilities_hour)
 
 		print "saving predictions to csv file" 
-		csv_filename = patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
+		patient_str = '-'.join(args.patients)
+		csv_filename = 'hours'+patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
 		print csv_filename
 		csv=open('./results/'+csv_filename, 'w+')
-		counter = 0
-		for dataset in datasets.all:
-			if dataset.enabled and not dataset.trainset:
-				for i in range(int(dataset.no_files * args.debug_sub_ratio)):
-					filename = dataset.base_name+str(i+1)+'.mat'
-					csv.write(filename+','+str(probabilities_test[counter+i])+'\n')
+		for i in range(yVal_hour.shape[0]):
+			csv.write(str(yVal_hour[i])+','+str(probabilities_hour[i])+'\n')
 		csv.close
+		
+		predictions_hour = np.round(probabilities_hour)
+		result_hour = yVal_hour==predictions_hour
+		acc_val_hour = float(np.sum(result_hour))/float(len(result_hour))
+		print "Accuracy validation for the hours: ", acc_val_hour
+
+		if not args.no_predict_test:
+			print "Calculating the predictions for the test files"
+			probabilities_test = []
+			for mag_test in magnitudes_test:
+				m_test = mag_test[ch]
+				patches = rolling_window_ext(m_test,(magnitude_window,ceil-floor))
+				predictions_patches = netSpec.predict_proba(patches)
+				prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+				probabilities_test.append(prediction_hour[1])
+
+			print "saving predictions to csv file" 
+			csv_filename = patient_str+'_'+str(ch)+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.csv'
+			print csv_filename
+			csv=open('./results/'+csv_filename, 'w+')
+			counter = 0
+			for dataset in datasets.all:
+				if dataset.enabled and not dataset.trainset:
+					for i in range(int(dataset.no_files * args.debug_sub_ratio)):
+						filename = dataset.base_name+str(i+1)+'.mat'
+						csv.write(filename+','+str(probabilities_test[counter+i])+'\n')
+			csv.close
 
 
 
