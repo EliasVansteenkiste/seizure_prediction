@@ -1,0 +1,1 @@
+python train.py --debug-sub-ratio=1 --config-filename=config.yml --no-channels=2 --target-gpu=gpu0 --data-path=/home/eavsteen/seizure_detection/data --patients patient2_6_15
