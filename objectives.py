@@ -165,6 +165,7 @@ class InterpolatedAucObjective():
         # get TPR1, TPR2, label_1, FPR1, T1, T2 from the estimated distribution
         idx = searchsorted(self.T, T_prediction, side='left')
 
+        # sometimes you need to extrapolate, sometimes you don't. Choose appropriate points
         idx_l = T.switch(T.eq((1-true_label)*self.extrapolate_left [idx-1],1), 0, self.idx_left [idx-1]                  )
         idx_r = T.switch(T.eq(   true_label *self.extrapolate_right[idx]  ,1), self.N_F+self.N_P+1,self.idx_right[idx  ], )
 
@@ -181,12 +182,9 @@ class InterpolatedAucObjective():
         AUC1 = self.AUC0 + f*TPR1 + l*(self.N_F-FPR1)
         dAUC = (TPR2 - TPR1)*f - (FPR2 - FPR1 - 1)*l
 
-        # deal with new parameters at edge of list of parameters
-        # note: they never have a gradient!
-        #coef = T.switch(T.isinf(T1), T.switch(T.isinf(T2), 0.5, 1.0),
-        #                             T.switch(T.isinf(T2), 0.0, T.switch(T.eq(T2,T1),0.0,
-        #                                                                             (T_prediction-T1)/(T2-T1)
-        #)))
+        # deal with the fact that T_prediction, T1 and T2 can all be equal, and make the gradient behave nicely
+        # when that happens.
+        # Epsilon is a bad solution, it messes up the gradient!
         coef = T.switch(T.eq(T2,T1),0.5*(T_prediction-T1),(T_prediction-T1)/(T2-T1) )
         #coef = (T_prediction-T1)/(T2-T1)
         AUCt = AUC1 + coef*dAUC
@@ -277,7 +275,7 @@ class InterpolatedAucObjective():
     def __call__(self,layers,
               loss_function,
               target,
-              aggregate=None,
+              aggregate=T.mean,
               **kwargs):
         output_layer = layers[-1]
         network_output = get_output(output_layer, **kwargs)
