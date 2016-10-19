@@ -88,7 +88,7 @@ def bc_with_ranking(y_prediction, y_true):
     # next, build a rank loss
 
     # translate into the raw scores before the logit
-    y_pred_score = T.log(y_pred / (1. - y_pred)
+    y_pred_score = T.log(y_pred / (1. - y_pred))
 
 
 
@@ -106,12 +106,12 @@ def bc_with_ranking(y_prediction, y_true):
     rankloss = T.sqr(T.clip(rankloss, -100., 0.))
 
     # average the loss for just the positive outcomes
-    rankloss = T.sum(rankloss) / (T.sum(y_true > 0.) + 1.)
+    rankloss = T.sum(rankloss) / (T.sum(y_true > 0.1) + 1.)
 
 
 
     # determine what the maximum score for a zero outcome is
-    y_pred_score_oneoutcome_min = T.min(y_pred_score * (y_true > 0.))
+    y_pred_score_oneoutcome_min = T.min(y_pred_score * (y_true > 0.1))
 
     # determine how much each score is above or below it
     rankloss_ = y_pred_score - y_pred_score_oneoutcome_min
@@ -127,7 +127,7 @@ def bc_with_ranking(y_prediction, y_true):
 
     # return (rankloss + 1) * logloss - an alternative to try
     #return rankloss + logloss
-    return logloss + 0.5*rankloss + 0.5*rankloss_ #+ logloss
+    return logloss + 0.01*rankloss + 0.01*rankloss_ #+ logloss
 
 
 #================ Turd objective ==================
@@ -223,6 +223,12 @@ class jonas_auc_objective():
         print "N_F:\t", self.N_F.get_value()
         print "AUC:\t", self.current_auc
 
+    def add_batch():
+        output_layer = layers[-1]
+        network_output = get_output(output_layer, **kwargs)
+        for output, label in zip(network_output,target):
+            self.add_points(output,label)
+
     def __call__(self,layers,
               loss_function,
               target,
@@ -230,7 +236,7 @@ class jonas_auc_objective():
               **kwargs):
         output_layer = layers[-1]
         network_output = get_output(output_layer, **kwargs)
-        return aggregate(self.auc_error(network_output, target))
+        return T.mean(self.auc_error(network_output, target))
 
 if __name__=="__main__":
     aucd = jonas_auc_objective()
