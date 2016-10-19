@@ -78,16 +78,17 @@ def bc_with_ranking(y_prediction, y_true):
     """ Trying to combine ranking loss with numeric precision"""
     # first get the log loss like normal
     #logloss = aggregate(T.nnet.binary_crossentropy(y_pred, y_true))
-    logloss = aggregate(T.nnet.categorical_crossentropy(y_prediction, y_true))
-    
-    y_pred = y_prediction[:,1]
-    # next, build a rank loss
     
     # clip the probabilities to keep stability
-    y_pred_clipped = T.clip(y_pred, _EPSILON, 1.-_EPSILON)
+    y_pred_clipped = T.clip(y_prediction, _EPSILON, 1.-_EPSILON)
+
+    logloss = aggregate(T.nnet.categorical_crossentropy(y_pred_clipped, y_true))
+    
+    y_pred = y_pred_clipped[:,1]
+    # next, build a rank loss
 
     # translate into the raw scores before the logit
-    y_pred_score = T.log(y_pred_clipped / (1. - y_pred_clipped))
+    y_pred_score = T.log(y_pred / (1. - y_pred)
 
 
 
@@ -126,7 +127,7 @@ def bc_with_ranking(y_prediction, y_true):
 
     # return (rankloss + 1) * logloss - an alternative to try
     #return rankloss + logloss
-    return 0.5*rankloss + 0.5*rankloss_ + logloss
+    return logloss + 0.5*rankloss + 0.5*rankloss_ #+ logloss
 
 
 #================ Turd objective ==================
@@ -134,7 +135,7 @@ def bc_with_ranking(y_prediction, y_true):
 MAX_INT = np.iinfo(np.int32).max
 
 
-class JonasAUCobjective():
+class jonas_auc_objective():
 
     #TODO: remove bias from 2 original values at infinity
 
@@ -208,11 +209,9 @@ class JonasAUCobjective():
         else:
             self.N_added += 1
 
-
     @property
     def current_auc(self):
         return self.AUC0.get_value() / (self.N_P.get_value() * self.N_F.get_value())
-
 
     def print_status(self):
         print "T:  \t", self.T.get_value()
@@ -224,12 +223,17 @@ class JonasAUCobjective():
         print "N_F:\t", self.N_F.get_value()
         print "AUC:\t", self.current_auc
 
-
-    def __call__(self, *args, **kwargs):
-        return self.auc_error(*args, **kwargs)
+    def __call__(self,layers,
+              loss_function,
+              target,
+              aggregate=None,
+              **kwargs):
+        output_layer = layers[-1]
+        network_output = get_output(output_layer, **kwargs)
+        return aggregate(self.auc_error(network_output, target))
 
 if __name__=="__main__":
-    aucd = JonasAUCobjective()
+    aucd = jonas_auc_objective()
 
     aucd.add_points(-1,1)
     aucd.add_points(3,1)
