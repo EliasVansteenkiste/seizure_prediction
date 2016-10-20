@@ -632,7 +632,7 @@ def test():
 	prediction = np.argmax(probabilities,axis=1)
 	print("Showing last 30 test samples..")
 	print("Predictions:")
-	print(prediction[-30:])
+	print(probabilities[-30:,1])
 	print("Ground Truth:")
 	print(yVal[-30:])
 	print("Performance on relevant data")

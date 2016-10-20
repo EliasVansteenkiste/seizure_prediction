@@ -274,7 +274,6 @@ class InterpolatedAucObjective():
         print "AUC:\t", self.current_auc
 
     def custom_scores(self, expected, predicted):
-        self.remove_points_older_than(15*30)
         self.add_points(predicted[:,1], expected)
         return self.current_auc
 

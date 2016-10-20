@@ -1101,7 +1101,7 @@ def benchmark_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlineariti
 
     auc_objective = InterpolatedAucObjective()
 
-    net = CustomAUCNeuralNet(
+    net = NeuralNet(
         layer,
         update=adam,
         update_learning_rate=0.001,
@@ -1131,7 +1131,7 @@ def net_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.ver
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=None, filter_size=(3,3), pad=1, num_filters=n_output)
     layer = GlobalPoolLayer(layer)
-    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.identity)
 
     auc_objective = InterpolatedAucObjective()
 
