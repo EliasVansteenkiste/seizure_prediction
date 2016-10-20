@@ -88,7 +88,7 @@ def bc_with_ranking(y_prediction, y_true):
     # next, build a rank loss
 
     # translate into the raw scores before the logit
-    y_pred_score = T.log(y_pred / (1. - y_pred)
+    y_pred_score = T.log(y_pred / (1. - y_pred))
 
 
 
@@ -248,7 +248,8 @@ class InterpolatedAucObjective():
         self.time_added = self.time_added[keep_idxs]
         self._update(labels, Ts)
 
-    def remove_all_points(self):
+    def remove_all_points(self, *args, **kwargs):
+        print "removing %d points, current AUC was %.4f"%(len(self.time_added)-2, self.current_auc)
         self.remove_points_older_than(0)
 
     @property
@@ -272,6 +273,12 @@ class InterpolatedAucObjective():
         print "time:\t", self.time_added
         print "AUC:\t", self.current_auc
 
+    def custom_scores(self, expected, predicted):
+        self.remove_points_older_than(15*30)
+        self.add_points(predicted[:,1], expected)
+        return self.current_auc
+
+
     def __call__(self,layers,
               loss_function,
               target,
@@ -279,7 +286,8 @@ class InterpolatedAucObjective():
               **kwargs):
         output_layer = layers[-1]
         network_output = get_output(output_layer, **kwargs)
-        return aggregate(self.auc_error(network_output, target))
+        # Negative, because it is a loss which is minimized!
+        return -aggregate(self.auc_error(network_output[:,1], target))
 
 
 

@@ -5,7 +5,8 @@ from lasagne import nonlinearities
 from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
 from lasagne.updates import nesterov_momentum
 from lasagne.updates import adam
-from objectives import roc_auc_loss, binary_crossentropy_with_ranking, bc_with_ranking
+from custom_net import CustomAUCNeuralNet
+from objectives import binary_crossentropy_with_ranking, bc_with_ranking, InterpolatedAucObjective
 from nolearn.lasagne import BatchIterator
 from nolearn.lasagne import NeuralNet
 import theano
@@ -1078,6 +1079,73 @@ def net26(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         #objective_loss_function=bc_with_ranking,
         objective = binary_crossentropy_with_ranking,
         on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+
+def benchmark_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    auc_objective = InterpolatedAucObjective()
+
+    net = CustomAUCNeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        #objective_loss_function=bc_with_ranking,
+        #objective = auc_objective,
+        #custom_train_scores = [("custom AUC", auc_objective.custom_scores)],
+        #on_epoch_finished=[auc_objective.remove_all_points, EarlyStopping(patience=10)],
+        on_epoch_finished=[EarlyStopping(patience=10)],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    auc_objective = InterpolatedAucObjective()
+
+    net = CustomAUCNeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        objective = auc_objective,
+        custom_train_scores = [("custom AUC", auc_objective.custom_scores)],
+        on_epoch_finished=[auc_objective.remove_all_points, EarlyStopping(patience=10)],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
     )
