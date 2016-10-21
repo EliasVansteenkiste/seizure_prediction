@@ -3,6 +3,7 @@ import numpy as np
 import math
 import scipy
 import global_vars as g
+import random
 
 def normalize(x):
 	return x/2000*255
@@ -557,7 +558,7 @@ class BI_train_bal_complete(BatchIterator):
 
 	def __call__(self, X, y=None):
 		self.y = y
-		print "BI_train_bal_complete called with len(X) =",len(X) 
+		#print "BI_train_bal_complete called with len(X) =",len(X) 
 		self.X = np.arange(len(X))
 		return self
 
@@ -594,6 +595,7 @@ class BI_train_bal_complete(BatchIterator):
 		return Xb_new, np.stack(yb_new)
 
 
+
 class BI_test_bal_complete(BatchIterator):
 
 	no_trials = 20
@@ -610,7 +612,7 @@ class BI_test_bal_complete(BatchIterator):
 
 	def __call__(self, X, y=None):
 		self.y = y
-		print "BI_test_bal_complete called with len(X) =",len(X) 
+		#print "BI_test_bal_complete called with len(X) =",len(X) 
 		self.X = np.arange(len(X))
 		self.X_orig = X
 		return self
@@ -663,3 +665,107 @@ class BI_test_bal_complete(BatchIterator):
 		Xb_new = normalize(np.stack(Xb_new))
 		Xb_new = Xb_new.astype(np.float32)
 		return Xb_new, np.stack(yb_new)
+
+
+class BI_train_balc_dropout(BatchIterator):
+
+	no_trials = 20
+
+	def __init__(self, batch_size, seed=42):
+
+		self.batch_size = batch_size
+		self.random = np.random.RandomState(seed)
+		preprocess_params = g.cfg['preprocess']
+		self.magnitude_window = preprocess_params['magnitude_window']
+		self.ceil = preprocess_params['ceil']
+		self.floor = preprocess_params['floor']
+		self.shuffle = False
+
+	def __call__(self, X, y=None):
+		self.y = y
+		#print "BI_train_bal_complete called with len(X) =",len(X) 
+		self.X = np.arange(len(X))
+		return self
+
+
+	def transform(self, Xb, yb):
+
+		# Select and normalize:
+		bs = Xb.shape[0]
+		Xb_new = []
+		yb_new = []
+
+		for idx in range(bs):
+			hour = Xb[idx]
+			slice = None
+			if yb[idx]:
+				hour = hour % g.magnitudes_seizure_train.shape[0]
+				r = xrange(self.magnitude_window)
+				start = np.random.choice(r)
+				for pos in range(start,g.magnitudes_seizure_train.shape[2]-self.magnitude_window+1,self.magnitude_window):
+					slice = g.magnitudes_seizure_train[hour, :, pos:pos+self.magnitude_window]
+					start_of_dropout = random.randint(0,self.magnitude_window-2)
+					end_of_dropout = random.randint(start_of_dropout,self.magnitude_window-1)
+					slice = np.copy(slice)
+					shape = slice[0,:,start_of_dropout:end_of_dropout].shape
+					slice[0,:,start_of_dropout:end_of_dropout] = np.zeros(shape)
+					Xb_new.append(slice)
+					yb_new.append(yb[idx])
+			else:
+				hour = hour % g.magnitudes_normal_train.shape[0]
+				r = xrange(self.magnitude_window)
+				start = np.random.choice(r)
+				for pos in range(start,g.magnitudes_normal_train.shape[2]-self.magnitude_window+1,self.magnitude_window):
+					slice = g.magnitudes_normal_train[hour, :, pos:pos+self.magnitude_window]
+					start_of_dropout = random.randint(0,self.magnitude_window-2)
+					end_of_dropout = random.randint(start_of_dropout,self.magnitude_window-1)
+					slice = np.copy(slice)
+					shape = slice[0,:,start_of_dropout:end_of_dropout].shape
+					slice[0,:,start_of_dropout:end_of_dropout] = np.zeros(shape)
+					Xb_new.append(slice)
+					yb_new.append(yb[idx])
+		Xb_new = np.stack(Xb_new)
+		Xb_new = normalize(Xb_new)
+		Xb_new = Xb_new.astype(np.float32)
+		return Xb_new, np.stack(yb_new)
+
+class BI_train_random(BatchIterator):
+
+	no_trials = 20
+
+	def __init__(self, batch_size, shuffle=False, seed=42):
+
+		self.batch_size = batch_size
+		self.shuffle = shuffle
+		self.random = np.random.RandomState(seed)
+		preprocess_params = g.cfg['preprocess']
+		self.magnitude_window = preprocess_params['magnitude_window']
+		self.ceil = preprocess_params['ceil']
+		self.floor = preprocess_params['floor']
+
+	def transform(self, Xb, yb):
+
+		Xb, yb = super(BI_train, self).transform(Xb, yb)
+
+		# Select and normalize:
+		bs = Xb.shape[0]
+		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
+		Xb_new = np.empty(new_shape)
+
+		for idx in range(bs):
+			if yb[idx]:
+				hour = int(math.floor(np.random.random_sample() * g.magnitudes_seizure_train.shape[0]))
+				r = xrange(g.magnitudes_seizure_train.shape[2]-self.magnitude_window)
+				start = np.random.choice(r)
+				slice = g.magnitudes_seizure_train[hour, :, start:start+self.magnitude_window]
+				Xb_new[idx] = slice
+			else:
+				hour = int(math.floor(np.random.random_sample() * g.magnitudes_normal_train.shape[0]))
+				r = xrange(g.magnitudes_normal_train.shape[2]-self.magnitude_window)
+				start = np.random.choice(r)
+				slice = g.magnitudes_normal_train[hour, :, start:start+self.magnitude_window]
+				Xb_new[idx] = slice
+
+		Xb_new = normalize(Xb_new)
+		Xb_new = Xb_new.astype(np.float32)
+		return Xb_new, yb

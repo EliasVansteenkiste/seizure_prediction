@@ -9,7 +9,7 @@ import pandas as pd
 import lasagne
 from lasagne.layers import get_output
 from lasagne.objectives import aggregate 
-
+from theano.ifelse import ifelse
 
 
 #================ first objective ==================
@@ -82,7 +82,7 @@ def bc_with_ranking(y_prediction, y_true):
     # clip the probabilities to keep stability
     y_pred_clipped = T.clip(y_prediction, _EPSILON, 1.-_EPSILON)
 
-    logloss = aggregate(T.nnet.categorical_crossentropy(y_pred_clipped, y_true))
+    logloss = aggregate(T.nnet.categorical_crossentropy(y_prediction, y_true))
     
     y_pred = y_pred_clipped[:,1]
     # next, build a rank loss
@@ -91,13 +91,15 @@ def bc_with_ranking(y_prediction, y_true):
     y_pred_score = T.log(y_pred / (1. - y_pred))
 
 
-
-
     # determine what the maximum score for a zero outcome is
-    y_pred_score_zerooutcome_max = T.max(y_pred_score * (y_true <1.))
+    max_zerooutcome = T.max(y_pred_score * (y_true <1.))
+
+    mean_oneoutcome = T.mean(y_pred_score * (y_true > 0.1))
+
+    border = ifelse(T.gt(max_zerooutcome, mean_oneoutcome), mean_oneoutcome, max_zerooutcome)
 
     # determine how much each score is above or below it
-    rankloss = y_pred_score - y_pred_score_zerooutcome_max
+    rankloss = y_pred_score - border
 
     # only keep losses for positive outcomes
     rankloss = rankloss * y_true
@@ -111,10 +113,14 @@ def bc_with_ranking(y_prediction, y_true):
 
 
     # determine what the maximum score for a zero outcome is
-    y_pred_score_oneoutcome_min = T.min(y_pred_score * (y_true > 0.1))
+    min_oneoutcome = T.min(y_pred_score * (y_true > 0.1))
+
+    mean_zerooutcome = T.mean(y_pred_score * (y_true < 1.))
+
+    border = ifelse(T.lt(min_oneoutcome, mean_zerooutcome), mean_zerooutcome, min_oneoutcome)
 
     # determine how much each score is above or below it
-    rankloss_ = y_pred_score - y_pred_score_oneoutcome_min
+    rankloss_ = y_pred_score - border
 
     # only keep losses for positive outcomes
     rankloss_ = rankloss_ * (1. - y_true)
@@ -127,7 +133,7 @@ def bc_with_ranking(y_prediction, y_true):
 
     # return (rankloss + 1) * logloss - an alternative to try
     #return rankloss + logloss
-    return logloss + 0.01*rankloss + 0.01*rankloss_ #+ logloss
+    return logloss #0.01*rankloss_ #+ 0.01*rankloss_ #+ logloss
 
 
 #================ Turd objective ==================
