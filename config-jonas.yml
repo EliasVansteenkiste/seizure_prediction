@@ -1,0 +1,15 @@
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 512
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net_jonas
+evaluation:
+    online_training: False
+    model: net0
