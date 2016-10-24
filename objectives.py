@@ -133,7 +133,7 @@ def bc_with_ranking(y_prediction, y_true):
 
     # return (rankloss + 1) * logloss - an alternative to try
     #return rankloss + logloss
-    return logloss #0.01*rankloss_ #+ 0.01*rankloss_ #+ logloss
+    return 0.01*rankloss_ + 0.01*rankloss + logloss
 
 
 #================ Turd objective ==================
