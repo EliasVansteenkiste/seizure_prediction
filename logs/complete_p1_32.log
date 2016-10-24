@@ -1,0 +1,96 @@
+['python', 'train.py', '--debug-sub-ratio=1', '--config-filename=config6.yml', '--no-channels=1', '--target-gpu=gpu2', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient2_0']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config6.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_path='/home/eavsteen/seizure_detection/vault', no_channels=1, no_predict_test=False, no_preprocessing=False, no_save_model=False, no_training=False, patients=['patient2_0'], plot_prob_dist=False, save_preprocessed=False, shift=0, shuffle_before_split=True, target_gpu='gpu2')
+Git reference:  Timestamp: 2016-10-23 20:16:20.515185
+Hostname: kat
+gpu2
+Configuration 'config6.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net29
+evaluation:
+    online_training: False
+    model: net29
+
+end Configuration
+['patient2_0']
+<type 'list'>
+Loading and preprocessing data...
+total
+191
+25
+train
+153
+20
+validation
+38
+5
+test_magnitude.shape (1406, 64)
+20
+5
+153
+38
+Read in dataset from train_3 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [0]
+/home/eavsteen/seizure_detection/data/train_3/3_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49

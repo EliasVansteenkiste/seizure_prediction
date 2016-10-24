@@ -13,6 +13,7 @@ import theano
 import theano.tensor as T
 import numpy as np
 from lasagne.init import HeNormal
+from lasagne.objectives import multiclass_hinge_loss
 import sys
 
 from EarlyStopping import EarlyStopping
@@ -42,6 +43,7 @@ class AdjustVariable(object):
 # for the larger networks (n>=9), we need to adjust pythons recursion limit
 sys.setrecursionlimit(10000)
 
+he_norm = HeNormal(gain='relu')
 
 def net0(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
@@ -1053,20 +1055,19 @@ def net25(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
     )
     return net
 
+#closely related to net11
 def net26(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.5)
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.5)
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
-    layer = Conv2DLayer(layer, nonlinearity=None, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
     layer = GlobalPoolLayer(layer)
     layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
-
-    from theano.compile.debugmode import DebugMode
 
     net = NeuralNet(
         layer,
@@ -1084,12 +1085,11 @@ def net26(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
     )
     return net
 
-
-def benchmark_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
-
+#closely related to net13
+def net27(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
-    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(64,1), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,64), pad=1, num_filters=32)
     layer = dropout(layer,p=0.5)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
@@ -1099,7 +1099,36 @@ def benchmark_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlineariti
     layer = GlobalPoolLayer(layer)
     layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
 
-    auc_objective = InterpolatedAucObjective()
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        objective = binary_crossentropy_with_ranking,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+#closely related to net14
+def net28(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.2)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=64)
+    layer = dropout(layer,p=0.3)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=128)
+    layer = dropout(layer,p=0.4)    
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=256)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=512)
+    layer = Conv2DLayer(layer, nonlinearity=None, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
 
     net = NeuralNet(
         layer,
@@ -1109,17 +1138,14 @@ def benchmark_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlineariti
         regression=False,
         max_epochs=100,
         verbose=1,
-        #objective_loss_function=bc_with_ranking,
-        #objective = auc_objective,
-        #custom_train_scores = [("custom AUC", auc_objective.custom_scores)],
-        #on_epoch_finished=[auc_objective.remove_all_points, EarlyStopping(patience=10)],
-        on_epoch_finished=[EarlyStopping(patience=10)],
+        objective = binary_crossentropy_with_ranking,
+        on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
     )
     return net
 
-def net_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+def net11_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
 
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
@@ -1150,3 +1176,276 @@ def net_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.ver
         batch_iterator_test = batch_iterator_test,
     )
     return net
+
+
+
+def net29(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net11 with he normalization
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net29_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net11 with he normalization
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    auc_objective = InterpolatedAucObjective()
+
+    net = CustomAUCNeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        objective = auc_objective,
+        custom_train_scores = [("custom AUC", auc_objective.custom_scores)],
+        on_epoch_finished=[auc_objective.remove_all_points, EarlyStopping(patience=10)],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+
+def net30(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net11 with he normalization and hinge loss objective
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        objective_loss_function = multiclass_hinge_loss,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+
+def net31(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #net13 with he normalization
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(64,1), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(1,64), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net32(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.2)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=64)
+    layer = dropout(layer,p=0.3)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=128)
+    layer = dropout(layer,p=0.4)    
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=256)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=512)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net33(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #net20 with henorm
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.2)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.3)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.4)    
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,1), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net34(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #net18 with henorm
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(32,1), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(1,128), pad=(1,63), num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net35(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net29 with more filters
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=64)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=128)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=128)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=256)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+def net36(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net11 with he normalization
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+    )
+    return net
+
+
+
+

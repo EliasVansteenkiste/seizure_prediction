@@ -1,0 +1,9091 @@
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_0']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_0'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 00:21:08.096389
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_0']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [0]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.792109056
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 199.036781311 184.038919067
+20 483.221002197 465.519171143
+30 718.880554199 694.377087402
+40 969.482617188 933.868884277
+50 1265.8637085 1213.74743652
+60 1644.84228516 1568.92561035
+70 2171.59033203 2061.92285156
+80 2997.35341797 2842.94628906
+90 4640.41015625 4440.24106445
+100 101397.328125 96893.890625
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.41481[0m     [32m0.86579[0m    1.63413      0.51729  9.91s
+      2     [36m0.60856[0m     [32m0.82636[0m    0.73643      0.55700  13.13s
+      3     [36m0.57611[0m     [32m0.81079[0m    0.71055      0.48853  13.61s
+      4     [36m0.54220[0m     [32m0.75108[0m    0.72190      0.60014  15.17s
+      5     [36m0.51041[0m     0.91675    0.55676      0.54433  18.83s
+      6     [36m0.46425[0m     0.83493    0.55603      0.51934  18.69s
+      7     [36m0.37959[0m     1.43855    0.26387      0.42520  18.75s
+      8     [36m0.30800[0m     1.35038    0.22808      0.47826  18.51s
+      9     [36m0.25164[0m     1.20320    0.20914      0.50873  14.23s
+     10     [36m0.21137[0m     1.79630    0.11767      0.44403  13.78s
+     11     [36m0.15224[0m     1.62816    0.09351      0.48716  13.39s
+     12     [36m0.13182[0m     3.41865    0.03856      0.42999  14.48s
+     13     [36m0.12350[0m     2.86167    0.04316      0.43615  12.14s
+     14     [36m0.10628[0m     2.58190    0.04117      0.45567  7.80s
+Early stopping.
+Best valid loss was 0.751078 at epoch 4.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 1 1 1 1 1 1 0 1 0 1 1 1 0 0 1 0 0 1 1 1 1 1 1 1 0 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.586849315068
+Error rate (%):  41.3150684932
+yVal [1 1 0 ..., 0 1 0]
+[[ 572 1262]
+ [ 246 1570]]
+roc_auc: 0.591331926556
+log_loss 0.76676748124
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.0024572   0.99754494]
+[ 0.06507595  0.93492526]
+[ 0.00293626  0.99706489]
+[ 0.59438509  0.40561467]
+[ 0.02977084  0.97022969]
+roc_auc for the hours: 0.567123287671
+log_loss for the hours inf
+saving predictions to csv file
+hourspatient1_0_net13_10-02-00-46-20.csv
+Accuracy validation for the hours:  0.358974358974
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [0]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.086185472
+saving predictions to csv file
+patient1_0_net13_10-02-01-01-25.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_1']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_1'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 01:01:26.773808
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_1']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [1]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.735592448
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 203.761627197 188.411010742
+20 496.77197876 482.61751709
+30 732.597296143 714.697686768
+40 973.972167969 949.532727051
+50 1245.81005859 1212.85552979
+60 1576.76357422 1532.16108398
+70 2013.54516602 1951.80438232
+80 2668.75805664 2577.9690918
+90 3942.10078125 3797.89812012
+100 71591.0625 60304.03125
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.40086[0m     [32m0.67274[0m    2.08232      0.57549  7.71s
+      2     [36m0.63632[0m     [32m0.66968[0m    0.95020      0.58781  8.71s
+      3     [36m0.59918[0m     0.68729    0.87180      0.60082  8.49s
+      4     [36m0.56773[0m     0.70409    0.80633      0.63540  8.35s
+      5     [36m0.54069[0m     0.72267    0.74818      0.58952  7.88s
+      6     [36m0.49270[0m     0.78422    0.62826      0.59089  8.50s
+      7     [36m0.41115[0m     0.80164    0.51289      0.57412  8.44s
+      8     [36m0.32418[0m     1.03970    0.31181      0.52208  9.37s
+      9     [36m0.24040[0m     1.20455    0.19958      0.51010  14.64s
+     10     [36m0.19638[0m     1.51072    0.12999      0.48990  14.72s
+     11     [36m0.16547[0m     2.02425    0.08174      0.48579  14.92s
+     12     [36m0.12777[0m     3.10217    0.04119      0.48613  14.84s
+Early stopping.
+Best valid loss was 0.669676 at epoch 2.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 1 0 1 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 1 0 1 1 0 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.597808219178
+Error rate (%):  40.2191780822
+yVal [1 1 0 ..., 0 1 0]
+[[ 667 1167]
+ [ 301 1515]]
+roc_auc: 0.601378333389
+log_loss 0.673726975507
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.04995864  0.95004207]
+[ 0.02425236  0.97574759]
+[ 0.02276107  0.97723925]
+[ 0.37001276  0.6299873 ]
+[ 0.526932    0.47306782]
+roc_auc for the hours: 0.613698630137
+log_loss for the hours 1.96733837315
+saving predictions to csv file
+hourspatient1_1_net13_10-02-01-36-01.csv
+Accuracy validation for the hours:  0.358974358974
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [1]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.086050304
+saving predictions to csv file
+patient1_1_net13_10-02-01-50-28.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_2']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_2'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 01:50:29.350470
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_2']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [2]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796028928
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 210.389639282 196.646928406
+20 506.963934326 496.903918457
+30 739.698999023 728.238903809
+40 971.565100098 956.919091797
+50 1226.64501953 1206.60388184
+60 1529.57705078 1501.93178711
+70 1919.78259277 1881.66341553
+80 2487.38320313 2434.10976563
+90 3554.0130127 3481.28129883
+100 119907.929688 146484.890625
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.25945[0m     [32m0.65581[0m    1.92044      0.55974  8.09s
+      2     [36m0.62116[0m     [32m0.65350[0m    0.95051      0.60698  7.40s
+      3     [36m0.57950[0m     0.69302    0.83619      0.54125  10.68s
+      4     [36m0.54895[0m     0.65513    0.83793      0.61383  12.14s
+      5     [36m0.52229[0m     0.70986    0.73576      0.59397  11.65s
+      6     [36m0.48149[0m     0.76434    0.62994      0.58097  8.35s
+      7     [36m0.41258[0m     1.06729    0.38657      0.49538  8.47s
+      8     [36m0.32466[0m     1.14097    0.28455      0.49880  7.95s
+      9     [36m0.23154[0m     1.55312    0.14908      0.45395  8.48s
+     10     [36m0.19125[0m     1.77608    0.10768      0.48477  8.37s
+     11     [36m0.15532[0m     1.78474    0.08703      0.47004  8.29s
+     12     [36m0.11608[0m     2.13971    0.05425      0.46628  7.98s
+Early stopping.
+Best valid loss was 0.653503 at epoch 2.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 1 0 1 1 1 1 0 1 1 1 1 1 0 0 1 1 1 1 0 1 0 1 1 0 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.602191780822
+Error rate (%):  39.7808219178
+yVal [1 1 0 ..., 0 1 0]
+[[ 687 1147]
+ [ 305 1511]]
+roc_auc: 0.60397805884
+log_loss 0.656002400215
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.33538008  0.66462022]
+[ 0.14321351  0.85678613]
+[ 0.00725007  0.99275005]
+[ 0.20832641  0.79167354]
+[ 0.29821968  0.70178109]
+roc_auc for the hours: 0.635616438356
+log_loss for the hours 1.5600346913
+saving predictions to csv file
+hourspatient1_2_net13_10-02-02-26-22.csv
+Accuracy validation for the hours:  0.397435897436
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [2]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.090019328
+saving predictions to csv file
+patient1_2_net13_10-02-02-36-35.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_3']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_3'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 02:36:37.159737
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_3']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [3]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796049408
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 19.1249866486 16.0321680069
+20 110.960594177 117.977423096
+30 462.367929077 465.247445679
+40 726.516931152 722.714147949
+50 983.638244629 972.796356201
+60 1269.06445312 1248.00100098
+70 1619.77319336 1586.1126709
+80 2106.37036133 2054.18427734
+90 2963.09577637 2880.79763184
+100 141686.875 89649.6484375
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.04066[0m     [32m1.04681[0m    0.99412      0.45601  7.77s
+      2     [36m0.57602[0m     [32m0.68763[0m    0.83769      0.51387  7.53s
+      3     [36m0.53588[0m     0.70376    0.76145      0.56898  7.12s
+      4     [36m0.48977[0m     0.81870    0.59823      0.58679  7.60s
+      5     [36m0.46905[0m     1.10879    0.42303      0.57275  7.94s
+      6     [36m0.42488[0m     1.22392    0.34715      0.59124  8.18s
+      7     [36m0.32942[0m     1.06708    0.30871      0.53509  8.74s
+      8     [36m0.32660[0m     1.93515    0.16877      0.50907  8.45s
+      9     [36m0.22861[0m     1.57340    0.14530      0.49777  8.01s
+     10     [36m0.20041[0m     3.26849    0.06132      0.49093  8.64s
+     11     [36m0.18540[0m     2.26325    0.08192      0.49949  8.34s
+     12     [36m0.15838[0m     1.98199    0.07991      0.49777  8.27s
+Early stopping.
+Best valid loss was 0.687627 at epoch 2.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 0 1 1 1 1 1 1 0 1 0 1 0 0 0 0 1 1 1 1 1 1 0 0 1 0 0 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.521917808219
+Error rate (%):  47.8082191781
+yVal [1 1 0 ..., 0 1 0]
+[[ 614 1220]
+ [ 525 1291]]
+roc_auc: 0.637344980279
+log_loss 0.681611886724
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[  4.57227958e-04   9.99544263e-01]
+[ 0.01143782  0.98856395]
+[ 0.00404692  0.99595368]
+[ 0.71614993  0.28384969]
+[ 0.85400361  0.14599602]
+roc_auc for the hours: 0.641095890411
+log_loss for the hours 1.74991563976
+saving predictions to csv file
+hourspatient1_3_net13_10-02-03-10-59.csv
+Accuracy validation for the hours:  0.307692307692
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [3]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.090043904
+saving predictions to csv file
+patient1_3_net13_10-02-03-17-40.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_4']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_4'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 03:17:42.027722
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_4']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [4]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796307456
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 235.407817078 219.809516907
+20 571.790344238 556.848303223
+30 840.501837158 821.775939941
+40 1116.47878418 1091.31035156
+50 1434.89074707 1400.26373291
+60 1840.24331055 1790.55202637
+70 2408.61494141 2333.43139648
+80 3297.89345703 3176.70976563
+90 4956.27602539 4739.19238281
+100 52009.53125 38008.9335938
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.58929[0m     [32m0.64438[0m    2.46641      0.63985  8.20s
+      2     [36m0.67352[0m     0.72816    0.92496      0.57035  7.94s
+      3     [36m0.64372[0m     0.71439    0.90107      0.56864  8.54s
+      4     [36m0.63143[0m     0.66164    0.95434      0.57960  8.53s
+      5     [36m0.62132[0m     0.68987    0.90063      0.57994  8.98s
+      6     [36m0.60392[0m     0.70863    0.85224      0.56933  8.72s
+      7     [36m0.54742[0m     0.69941    0.78269      0.60459  9.20s
+      8     [36m0.46772[0m     0.72801    0.64246      0.58097  9.16s
+      9     [36m0.34384[0m     0.95432    0.36029      0.52585  9.34s
+     10     [36m0.25431[0m     1.56092    0.16292      0.49059  9.51s
+     11     [36m0.18283[0m     1.50375    0.12158      0.49641  9.36s
+Early stopping.
+Best valid loss was 0.644375 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 1 1 0 1 1 0 1 0 1 1 1 1 1 1 1 1 0 1 1 1 1 0 1 0 1 0 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.613698630137
+Error rate (%):  38.6301369863
+yVal [1 1 0 ..., 0 1 0]
+[[ 605 1229]
+ [ 181 1635]]
+roc_auc: 0.634337813883
+log_loss 0.656391997904
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.07486655  0.92513394]
+[ 0.07116087  0.92883974]
+[ 0.11427629  0.88572371]
+[ 0.29537204  0.70462817]
+[ 0.26744416  0.73255652]
+roc_auc for the hours: 0.687671232877
+log_loss for the hours 1.45154605256
+saving predictions to csv file
+hourspatient1_4_net13_10-02-03-41-11.csv
+Accuracy validation for the hours:  0.371794871795
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [4]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.087942656
+saving predictions to csv file
+patient1_4_net13_10-02-03-44-57.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_5']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_5'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 03:44:59.046420
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_5']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [5]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.797413376
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 231.335012817 211.108001709
+20 564.578271484 538.999780273
+30 830.936474609 795.66987915
+40 1104.11230469 1055.32932129
+50 1420.78125 1352.56451416
+60 1826.70258789 1730.86726074
+70 2401.11716309 2262.68579102
+80 3287.26503906 3085.56469727
+90 4899.46132813 4571.94418945
+100 55591.203125 52662.2460938
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.57529[0m     [32m0.66848[0m    2.35654      0.58644  8.12s
+      2     [36m0.67314[0m     0.80972    0.83132      0.53646  7.65s
+      3     [36m0.64664[0m     0.80243    0.80586      0.54502  8.21s
+      4     [36m0.61186[0m     0.72146    0.84809      0.55871  8.52s
+      5     [36m0.56974[0m     0.72437    0.78653      0.56385  8.27s
+      6     [36m0.51872[0m     0.74520    0.69608      0.57754  8.13s
+      7     [36m0.41984[0m     0.85384    0.49171      0.59466  8.31s
+      8     [36m0.32950[0m     1.10976    0.29691      0.53817  12.07s
+      9     [36m0.25729[0m     1.47307    0.17467      0.48237  12.23s
+     10     [36m0.19743[0m     1.76032    0.11215      0.47860  11.95s
+     11     [36m0.15764[0m     1.88193    0.08377      0.46491  12.03s
+Early stopping.
+Best valid loss was 0.668476 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 1 1 0 1 1 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.575890410959
+Error rate (%):  42.4109589041
+yVal [1 1 0 ..., 0 1 0]
+[[ 470 1364]
+ [ 184 1632]]
+roc_auc: 0.670667914911
+log_loss 0.670199540006
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.00676082  0.99323851]
+[ 0.00496822  0.99503142]
+[ 0.1925814   0.80741924]
+[ 0.19875304  0.801247  ]
+[ 0.24147047  0.75852972]
+roc_auc for the hours: 0.709589041096
+log_loss for the hours 1.64240315381
+saving predictions to csv file
+hourspatient1_5_net13_10-02-04-00-52.csv
+Accuracy validation for the hours:  0.294871794872
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [5]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.089548288
+saving predictions to csv file
+patient1_5_net13_10-02-04-05-40.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_6']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_6'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 04:05:41.955979
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_6']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [6]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.795971584
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 199.270783997 178.304678345
+20 484.265484619 454.425598145
+30 715.207281494 673.034472656
+40 957.550097656 897.335144043
+50 1246.79968262 1160.86651611
+60 1628.27236328 1502.71569824
+70 2172.52145996 1989.60817871
+80 3015.20869141 2745.85849609
+90 4633.05883789 4178.59511719
+100 66751.359375 59361.5703125
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.51574[0m     [32m0.66532[0m    2.27821      0.60425  7.54s
+      2     [36m0.67428[0m     0.86083    0.78329      0.54981  7.20s
+      3     [36m0.64125[0m     0.79297    0.80867      0.56282  7.69s
+      4     [36m0.60481[0m     0.68171    0.88720      0.60356  7.49s
+      5     [36m0.57709[0m     0.70572    0.81773      0.60356  7.67s
+      6     [36m0.54514[0m     0.78289    0.69632      0.58987  8.09s
+      7     [36m0.44995[0m     0.69718    0.64539      0.59261  8.08s
+      8     [36m0.36912[0m     0.83996    0.43945      0.57343  8.35s
+      9     [36m0.27952[0m     0.98817    0.28287      0.55084  8.34s
+     10     [36m0.22841[0m     1.14120    0.20015      0.47860  8.38s
+     11     [36m0.17829[0m     1.59599    0.11171      0.50531  8.10s
+Early stopping.
+Best valid loss was 0.665322 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 1 1 0 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.601369863014
+Error rate (%):  39.8630136986
+yVal [1 1 0 ..., 0 1 0]
+[[ 389 1445]
+ [  10 1806]]
+roc_auc: 0.669982741558
+log_loss 0.664913978933
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.02936848  0.9706319 ]
+[ 0.00461912  0.99538124]
+[ 0.0590692   0.94093102]
+[ 0.02351563  0.97648406]
+[ 0.08168897  0.91831046]
+roc_auc for the hours: 0.802739726027
+log_loss for the hours 1.91667676515
+saving predictions to csv file
+hourspatient1_6_net13_10-02-04-32-12.csv
+Accuracy validation for the hours:  0.25641025641
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [6]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.0876928
+saving predictions to csv file
+patient1_6_net13_10-02-04-37-03.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_7']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_7'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 04:37:04.221468
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_7']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [7]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796319744
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 182.900706482 163.150218201
+20 446.00692749 416.755505371
+30 662.357696533 620.480499268
+40 892.956396484 834.12010498
+50 1172.0982666 1087.89544678
+60 1542.81384277 1420.86425781
+70 2076.69821777 1899.79864502
+80 2929.02983398 2668.57714844
+90 4619.13442383 4199.77285156
+100 65353.1796875 57503.8945312
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  ------
+      1     [36m1.48557[0m     [32m0.75082[0m    1.97860      0.56145  22.76s
+      2     [36m0.66471[0m     0.79051    0.84087      0.55563  13.47s
+      3     [36m0.63086[0m     0.80470    0.78398      0.55974  14.01s
+      4     [36m0.57466[0m     [32m0.66914[0m    0.85881      0.62958  13.69s
+      5     [36m0.51713[0m     0.67766    0.76311      0.65628  14.23s
+      6     [36m0.46285[0m     0.74736    0.61931      0.62342  14.60s
+      7     [36m0.37479[0m     0.73024    0.51323      0.61109  14.47s
+      8     [36m0.30128[0m     0.86360    0.34886      0.59534  14.62s
+      9     [36m0.24037[0m     1.17406    0.20474      0.53886  14.99s
+     10     [36m0.18485[0m     1.29562    0.14267      0.55734  15.20s
+     11     [36m0.16932[0m     1.50615    0.11242      0.52722  11.73s
+     12     [36m0.13265[0m     1.86143    0.07126      0.52105  9.22s
+     13     [36m0.12005[0m     1.64813    0.07284      0.52790  9.08s
+     14     [36m0.10148[0m     2.44305    0.04154      0.51044  9.04s
+Early stopping.
+Best valid loss was 0.669143 at epoch 4.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 0 1 1 1 1 1 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 0 1 1 1 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.624383561644
+Error rate (%):  37.5616438356
+yVal [1 1 0 ..., 0 1 0]
+[[ 584 1250]
+ [ 121 1695]]
+roc_auc: 0.673189424911
+log_loss 0.668810073068
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.23082004  0.76918012]
+[ 0.00240287  0.99759817]
+[ 0.09307744  0.90692383]
+[ 0.25860009  0.74139965]
+[ 0.06427322  0.93572783]
+roc_auc for the hours: 0.742465753425
+log_loss for the hours 1.43067553213
+saving predictions to csv file
+hourspatient1_7_net13_10-02-04-59-06.csv
+Accuracy validation for the hours:  0.358974358974
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [7]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.090265088
+saving predictions to csv file
+patient1_7_net13_10-02-05-02-27.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_8']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_8'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 05:02:29.109363
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_8']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [8]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.795865088
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 179.447947693 164.423493958
+20 434.278393555 418.093994141
+30 634.319030762 613.24385376
+40 834.442565918 807.11171875
+50 1056.00579834 1020.13357544
+60 1321.37426758 1274.3189209
+70 1666.15869141 1603.34324951
+80 2169.84814453 2082.13676758
+90 3113.30068359 2981.24484863
+100 59862.1054688 57871.4179688
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  ------
+      1     [36m1.22504[0m     [32m0.70647[0m    1.73404      0.52996  12.38s
+      2     [36m0.63287[0m     0.74380    0.85085      0.56898  9.68s
+      3     [36m0.59902[0m     0.71929    0.83280      0.50291  9.57s
+      4     [36m0.55552[0m     [32m0.65846[0m    0.84367      0.54639  9.44s
+      5     [36m0.49189[0m     0.88897    0.55332      0.52687  9.40s
+      6     [36m0.41430[0m     0.92508    0.44785      0.50907  12.39s
+      7     [36m0.32074[0m     1.40962    0.22754      0.47415  12.34s
+      8     [36m0.22590[0m     2.21523    0.10198      0.45909  12.16s
+      9     [36m0.17147[0m     1.83468    0.09346      0.49880  11.62s
+     10     [36m0.12943[0m     3.00990    0.04300      0.49059  8.61s
+     11     [36m0.10479[0m     3.86171    0.02714      0.47381  8.90s
+     12     [36m0.10286[0m     3.18794    0.03227      0.49606  9.05s
+     13     [36m0.09482[0m     3.96555    0.02391      0.46046  10.23s
+     14     [36m0.07361[0m     2.87508    0.02560      0.48750  12.31s
+Early stopping.
+Best valid loss was 0.658458 at epoch 4.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 1 1 1 0 1 1 0 0 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 1 0 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.54301369863
+Error rate (%):  45.698630137
+yVal [1 1 0 ..., 0 1 0]
+[[ 864  970]
+ [ 698 1118]]
+roc_auc: 0.607781191301
+log_loss 0.667456314316
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.20790198  0.79209793]
+[ 0.15997107  0.84002942]
+[ 0.15768044  0.84231997]
+[ 0.60796583  0.39203387]
+[ 0.83971953  0.16028138]
+roc_auc for the hours: 0.578082191781
+log_loss for the hours 1.06682636572
+saving predictions to csv file
+hourspatient1_8_net13_10-02-05-15-28.csv
+Accuracy validation for the hours:  0.461538461538
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [8]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.089900544
+saving predictions to csv file
+patient1_8_net13_10-02-05-19-05.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_9']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_9'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 05:19:06.940210
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_9']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [9]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796340224
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 3.68383948803 3.51945617199
+20 8.91916770935 8.73870506287
+30 13.5332503319 13.2244482994
+40 19.6162849426 18.9431503296
+50 42.7269630432 33.8711013794
+60 446.623547363 383.009014893
+70 778.942749023 709.81932373
+80 1201.11340332 1105.85910645
+90 1927.03088379 1777.32213135
+100 43853.8789062 40357.3945312
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m0.89610[0m     [32m0.94532[0m    0.94793      0.43992  7.37s
+      2     [36m0.64764[0m     [32m0.74916[0m    0.86449      0.48340  7.14s
+      3     [36m0.61853[0m     0.82562    0.74917      0.48477  7.13s
+      4     [36m0.57933[0m     0.79818    0.72582      0.50325  7.13s
+      5     [36m0.53187[0m     1.31514    0.40442      0.44334  7.25s
+      6     [36m0.46387[0m     1.48976    0.31138      0.48134  7.76s
+      7     [36m0.41406[0m     2.73521    0.15138      0.47723  7.79s
+      8     [36m0.40466[0m     2.01525    0.20080      0.47518  7.78s
+      9     [36m0.38088[0m     1.88424    0.20214      0.51044  7.78s
+     10     [36m0.37020[0m     2.48868    0.14875      0.50668  7.78s
+     11     [36m0.36329[0m     5.55550    0.06539      0.51626  7.78s
+     12     [36m0.34957[0m     4.06462    0.08600      0.49846  7.88s
+Early stopping.
+Best valid loss was 0.749158 at epoch 2.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 0 0 1 0 1 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.476438356164
+Error rate (%):  52.3561643836
+yVal [1 1 0 ..., 0 1 0]
+[[ 232 1602]
+ [ 309 1507]]
+roc_auc: 0.528598631335
+log_loss 0.742301186858
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.07210278  0.92789733]
+[ 0.44821024  0.55178976]
+[ 0.44991609  0.55008423]
+[ 0.1606544   0.83934504]
+[ 0.79572737  0.20427184]
+roc_auc for the hours: 0.528767123288
+log_loss for the hours 1.49698910657
+saving predictions to csv file
+hourspatient1_9_net13_10-02-05-27-31.csv
+Accuracy validation for the hours:  0.192307692308
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [9]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.090494464
+saving predictions to csv file
+patient1_9_net13_10-02-05-30-27.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_10']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_10'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 05:30:28.292780
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_10']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [10]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.79634432
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 181.207902527 167.670619202
+20 438.332196045 424.686590576
+30 639.719543457 622.390942383
+40 839.969042969 817.731738281
+50 1060.19781494 1030.7331543
+60 1320.43032227 1280.04846191
+70 1650.03087158 1595.78609619
+80 2111.48989258 2038.48054199
+90 2911.55273438 2807.46408691
+100 41643.4882812 36225.46875
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.13489[0m     [32m0.67667[0m    1.67716      0.56351  7.74s
+      2     [36m0.60961[0m     0.73253    0.83220      0.57480  7.84s
+      3     [36m0.58186[0m     0.70694    0.82306      0.62068  7.48s
+      4     [36m0.54151[0m     [32m0.64238[0m    0.84297      0.62513  8.08s
+      5     [36m0.49332[0m     0.75773    0.65105      0.56590  7.76s
+      6     [36m0.42181[0m     0.94229    0.44765      0.49230  8.42s
+      7     [36m0.32010[0m     1.20090    0.26655      0.49195  8.71s
+      8     [36m0.22303[0m     1.49146    0.14954      0.49469  8.79s
+      9     [36m0.16497[0m     1.46406    0.11268      0.50633  8.54s
+     10     [36m0.13568[0m     2.26804    0.05982      0.47689  8.83s
+     11     [36m0.09700[0m     3.00127    0.03232      0.48442  8.35s
+     12     [36m0.08915[0m     3.58225    0.02489      0.47723  8.67s
+     13     [36m0.07023[0m     3.28564    0.02137      0.48237  8.54s
+     14     0.08195     2.78766    0.02940      0.47141  9.20s
+Early stopping.
+Best valid loss was 0.642379 at epoch 4.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 0 1 1 1 1 1 1 0 1 0 1 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.614246575342
+Error rate (%):  38.5753424658
+yVal [1 1 0 ..., 0 1 0]
+[[ 785 1049]
+ [ 359 1457]]
+roc_auc: 0.630735099131
+log_loss 0.651307486083
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.12215062  0.87784898]
+[ 0.1169498   0.88305038]
+[ 0.00218346  0.9978202 ]
+[ 0.31611156  0.68388885]
+[ 0.47551587  0.52448368]
+roc_auc for the hours: 0.649315068493
+log_loss for the hours 1.63808425553
+saving predictions to csv file
+hourspatient1_10_net13_10-02-05-38-25.csv
+Accuracy validation for the hours:  0.397435897436
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [10]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.090568192
+saving predictions to csv file
+patient1_10_net13_10-02-05-41-19.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_11']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_11'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 05:41:20.993003
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_11']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [11]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796430336
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 172.641601563 159.5427948
+20 417.636303711 403.23772583
+30 608.427856445 589.179815674
+40 796.191516113 769.670605469
+50 999.883514404 964.325683594
+60 1236.0432373 1189.17692871
+70 1532.10228271 1470.09255371
+80 1945.44143066 1860.52646484
+90 2669.32939453 2545.69404297
+100 34311.5273438 30092.4199219
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.05099[0m     [32m0.65883[0m    1.59524      0.65799  8.25s
+      2     [36m0.57424[0m     0.71586    0.80217      0.64875  7.95s
+      3     [36m0.54513[0m     0.73765    0.73901      0.62034  8.02s
+      4     [36m0.52097[0m     0.70552    0.73843      0.65389  8.08s
+      5     [36m0.48056[0m     0.74509    0.64497      0.61280  8.21s
+      6     [36m0.40086[0m     0.80923    0.49536      0.56488  8.05s
+      7     [36m0.28073[0m     1.96419    0.14292      0.43615  8.09s
+      8     [36m0.19881[0m     1.94171    0.10239      0.44608  8.27s
+      9     [36m0.14851[0m     1.52358    0.09748      0.45840  7.94s
+     10     [36m0.11608[0m     2.39946    0.04838      0.46251  7.99s
+     11     [36m0.09962[0m     3.17859    0.03134      0.45669  8.34s
+Early stopping.
+Best valid loss was 0.658827 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 0 1 1 1 1 1 0 1 1 1 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.648219178082
+Error rate (%):  35.1780821918
+yVal [1 1 0 ..., 0 1 0]
+[[ 747 1087]
+ [ 197 1619]]
+roc_auc: 0.607672500348
+log_loss 0.657147583059
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.08716177  0.91283858]
+[ 0.0312802   0.96871883]
+[ 0.01437828  0.98562211]
+[ 0.01208812  0.98791224]
+[ 0.60125601  0.39874375]
+roc_auc for the hours: 0.641095890411
+log_loss for the hours 2.35976446553
+saving predictions to csv file
+hourspatient1_11_net13_10-02-05-51-18.csv
+Accuracy validation for the hours:  0.435897435897
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [11]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.088438272
+saving predictions to csv file
+patient1_11_net13_10-02-05-54-16.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_12']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_12'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 05:54:17.304857
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_12']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [12]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796229632
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 194.413856506 178.851933289
+20 463.675524902 446.537554932
+30 666.165478516 644.010736084
+40 859.942541504 831.373522949
+50 1065.9508667 1029.34899902
+60 1304.29125977 1256.71569824
+70 1606.91943359 1543.18864746
+80 2047.88012695 1958.46350098
+90 2871.70686035 2742.33198242
+100 68176.640625 59867.6914062
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.11340[0m     [32m0.63894[0m    1.74259      0.64498  7.74s
+      2     [36m0.60246[0m     0.72608    0.82975      0.60356  7.69s
+      3     [36m0.56050[0m     0.64398    0.87038      0.63780  7.98s
+      4     [36m0.51694[0m     0.72496    0.71306      0.56282  7.96s
+      5     [36m0.49445[0m     0.77561    0.63750      0.60219  8.21s
+      6     [36m0.42347[0m     0.95807    0.44201      0.52687  8.74s
+      7     [36m0.32036[0m     1.57623    0.20325      0.46799  8.83s
+      8     [36m0.26196[0m     1.31894    0.19861      0.52722  8.60s
+      9     [36m0.16958[0m     1.62593    0.10430      0.52414  9.02s
+     10     [36m0.12488[0m     1.73889    0.07181      0.50770  8.73s
+     11     [36m0.11418[0m     1.60646    0.07107      0.55187  8.89s
+Early stopping.
+Best valid loss was 0.638937 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 1 0 1 0 1 1 1 1 0 1 1 1 1 1 0 1 1 1 1 1 1 0 0 0 1 0 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.647123287671
+Error rate (%):  35.2876712329
+yVal [1 1 0 ..., 0 1 0]
+[[ 610 1224]
+ [  64 1752]]
+roc_auc: 0.697901604062
+log_loss 0.637316523538
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[  8.53498583e-04   9.99146998e-01]
+[ 0.05100948  0.94899297]
+[ 0.00363463  0.99636763]
+[ 0.21585809  0.78414172]
+[ 0.07982764  0.92017174]
+roc_auc for the hours: 0.783561643836
+log_loss for the hours 1.92770600298
+saving predictions to csv file
+hourspatient1_12_net13_10-02-06-00-50.csv
+Accuracy validation for the hours:  0.371794871795
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [12]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.087844352
+saving predictions to csv file
+patient1_12_net13_10-02-06-03-58.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_13']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_13'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 06:03:59.843397
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_13']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [13]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796536832
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 197.41583252 182.761578369
+20 473.741113281 459.648413086
+30 683.193365479 665.443499756
+40 884.565112305 862.165649414
+50 1098.331604 1068.85339355
+60 1343.71057129 1304.4578125
+70 1651.5090332 1598.25623779
+80 2090.38417969 2016.00366211
+90 2902.72646484 2791.59272461
+100 37327.25 36955.34375
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.12169[0m     [32m0.61390[0m    1.82716      0.65423  8.49s
+      2     [36m0.57349[0m     0.65938    0.86974      0.61383  8.03s
+      3     [36m0.53759[0m     0.67183    0.80019      0.57446  7.50s
+      4     [36m0.50677[0m     0.69146    0.73290      0.56590  7.39s
+      5     [36m0.47471[0m     0.74905    0.63375      0.54262  7.38s
+      6     [36m0.41575[0m     0.98606    0.42163      0.53269  8.10s
+      7     [36m0.31920[0m     1.68796    0.18911      0.48887  8.02s
+      8     [36m0.23582[0m     1.94439    0.12128      0.49846  7.99s
+      9     [36m0.16788[0m     2.21662    0.07574      0.48990  8.08s
+     10     [36m0.13385[0m     2.55102    0.05247      0.50188  7.99s
+     11     [36m0.11526[0m     2.85915    0.04031      0.48990  7.98s
+Early stopping.
+Best valid loss was 0.613900 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 0 0 1 0 0 1 0 1 1 1 1 1 0 0 1 0 0 1 1 0 0 0 1 0 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.65698630137
+Error rate (%):  34.301369863
+yVal [1 1 0 ..., 0 1 0]
+[[1081  753]
+ [ 499 1317]]
+roc_auc: 0.694644778751
+log_loss 0.611192087214
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.15502723  0.84497273]
+[ 0.37457153  0.62542862]
+[ 0.22859907  0.77140045]
+[ 0.53465432  0.46534529]
+[ 0.42493993  0.57506013]
+roc_auc for the hours: 0.761643835616
+log_loss for the hours 0.852614292004
+saving predictions to csv file
+hourspatient1_13_net13_10-02-06-10-36.csv
+Accuracy validation for the hours:  0.653846153846
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [13]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.08832768
+saving predictions to csv file
+patient1_13_net13_10-02-06-13-30.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_14']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_14'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 06:13:31.666834
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_14']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [14]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.796135424
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 189.141261292 174.980825806
+20 452.630731201 438.836401367
+30 649.66987915 632.660009766
+40 836.557116699 814.948742676
+50 1031.56469727 1003.98742676
+60 1251.25163574 1216.06953125
+70 1519.30529785 1471.67954102
+80 1885.33984375 1820.3204834
+90 2516.96833496 2415.86462402
+100 43412.1367188 33402.015625
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.04639[0m     [32m0.62204[0m    1.68221      0.61725  7.65s
+      2     [36m0.56469[0m     0.62945    0.89711      0.59192  7.92s
+      3     [36m0.52836[0m     0.64877    0.81440      0.57583  7.84s
+      4     [36m0.49561[0m     0.66501    0.74526      0.61520  8.10s
+      5     [36m0.46399[0m     0.76375    0.60752      0.58473  8.77s
+      6     [36m0.40011[0m     0.93100    0.42977      0.57035  8.11s
+      7     [36m0.32132[0m     1.29271    0.24857      0.53372  8.89s
+      8     [36m0.22502[0m     1.55329    0.14487      0.53372  8.73s
+      9     [36m0.15381[0m     1.74707    0.08804      0.52824  9.51s
+     10     [36m0.13248[0m     2.03618    0.06506      0.50359  8.77s
+     11     [36m0.11437[0m     2.25494    0.05072      0.50325  8.30s
+Early stopping.
+Best valid loss was 0.622037 at epoch 1.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 0 1 1 1 1 1 0 1 1 1 1 0 0 0 1 0 1 1 1 0 0 0 0 0 1 0]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.624657534247
+Error rate (%):  37.5342465753
+yVal [1 1 0 ..., 0 1 0]
+[[1142  692]
+ [ 678 1138]]
+roc_auc: 0.695423930745
+log_loss 0.619190791585
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.04199664  0.95800382]
+[ 0.32605526  0.67394459]
+[ 0.28067982  0.71932   ]
+[ 0.62531364  0.37468627]
+[ 0.86868542  0.13131428]
+roc_auc for the hours: 0.709589041096
+log_loss for the hours 0.720530231062
+saving predictions to csv file
+hourspatient1_14_net13_10-02-06-22-50.csv
+Accuracy validation for the hours:  0.666666666667
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [14]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.090154496
+saving predictions to csv file
+patient1_14_net13_10-02-06-25-51.csv
+['python', 'train_batch.py', '--debug-sub-ratio=1', '--model-filename=run4.pickle', '--config-filename=config5.yml', '--no-channels=1', '--target-gpu=gpu3', '--data-path=/home/eavsteen/seizure_detection/data', '--patients=patient1_15']
+init done
+Command line arguments: Namespace(chosen_validation_ratio=0.2, config_filename='config5.yml', data_path='/home/eavsteen/seizure_detection/data', debug_sub_ratio=1.0, exclude_user=[], fixed_seed=True, include_user=[], mode='None', model_filename='run4.pickle', no_channels=1, no_preprocessing=False, no_save_model=False, no_save_preprocessed=False, no_training=False, patients=['patient1_15'], plot_prob_dist=False, shift=0, shuffle_before_split=True, target_gpu='gpu3')
+Git reference:  Timestamp: 2016-10-02 06:25:52.860736
+Hostname: kat
+gpu3
+Configuration 'config5.yml':
+Configuration:
+preprocess:
+    floor: 0
+    ceil: 64
+    fft_width: 1024
+    overlap: 0
+    magnitude_window: 192
+    augmentation: shift
+    normalization: min_max_x255
+    include_userdata: false
+training:
+    model: net13
+evaluation:
+    online_training: False
+    model: net13
+
+end Configuration
+['patient1_15']
+<type 'list'>
+Loading and preprocessing data...
+total
+365
+25
+train
+292
+20
+validation
+73
+5
+test_magnitude.shape (1406, 64)
+20
+5
+292
+73
+Read in dataset from train_2 ...
+Processing data ...
+read data and preprocess (fft and slicing)
+read in channels [15]
+/home/eavsteen/seizure_detection/data/train_2/2_
+normal i 0
+normal i 1
+normal i 2
+normal i 3
+normal i 4
+normal i 5
+normal i 6
+normal i 7
+normal i 8
+normal i 9
+normal i 10
+normal i 11
+normal i 12
+normal i 13
+normal i 14
+normal i 15
+normal i 16
+normal i 17
+normal i 18
+normal i 19
+normal i 20
+normal i 21
+normal i 22
+normal i 23
+normal i 24
+normal i 25
+normal i 26
+normal i 27
+normal i 28
+normal i 29
+normal i 30
+normal i 31
+normal i 32
+normal i 33
+normal i 34
+normal i 35
+normal i 36
+normal i 37
+normal i 38
+normal i 39
+normal i 40
+normal i 41
+normal i 42
+normal i 43
+normal i 44
+normal i 45
+normal i 46
+normal i 47
+normal i 48
+normal i 49
+normal i 50
+normal i 51
+normal i 52
+normal i 53
+normal i 54
+normal i 55
+normal i 56
+normal i 57
+normal i 58
+normal i 59
+normal i 60
+normal i 61
+normal i 62
+normal i 63
+normal i 64
+normal i 65
+normal i 66
+normal i 67
+normal i 68
+normal i 69
+normal i 70
+normal i 71
+normal i 72
+normal i 73
+normal i 74
+normal i 75
+normal i 76
+normal i 77
+normal i 78
+normal i 79
+normal i 80
+normal i 81
+normal i 82
+normal i 83
+normal i 84
+normal i 85
+normal i 86
+normal i 87
+normal i 88
+normal i 89
+normal i 90
+normal i 91
+normal i 92
+normal i 93
+normal i 94
+normal i 95
+normal i 96
+normal i 97
+normal i 98
+normal i 99
+normal i 100
+normal i 101
+normal i 102
+normal i 103
+normal i 104
+normal i 105
+normal i 106
+normal i 107
+normal i 108
+normal i 109
+normal i 110
+normal i 111
+normal i 112
+normal i 113
+normal i 114
+normal i 115
+normal i 116
+normal i 117
+normal i 118
+normal i 119
+normal i 120
+normal i 121
+normal i 122
+normal i 123
+normal i 124
+normal i 125
+normal i 126
+normal i 127
+normal i 128
+normal i 129
+normal i 130
+normal i 131
+normal i 132
+normal i 133
+normal i 134
+normal i 135
+normal i 136
+normal i 137
+normal i 138
+normal i 139
+normal i 140
+normal i 141
+normal i 142
+normal i 143
+normal i 144
+normal i 145
+normal i 146
+normal i 147
+normal i 148
+normal i 149
+normal i 150
+normal i 151
+normal i 152
+normal i 153
+normal i 154
+normal i 155
+normal i 156
+normal i 157
+normal i 158
+normal i 159
+normal i 160
+normal i 161
+normal i 162
+normal i 163
+normal i 164
+normal i 165
+normal i 166
+normal i 167
+normal i 168
+normal i 169
+normal i 170
+normal i 171
+normal i 172
+normal i 173
+normal i 174
+normal i 175
+normal i 176
+normal i 177
+normal i 178
+normal i 179
+normal i 180
+normal i 181
+normal i 182
+normal i 183
+normal i 184
+normal i 185
+normal i 186
+normal i 187
+normal i 188
+normal i 189
+normal i 190
+normal i 191
+normal i 192
+normal i 193
+normal i 194
+normal i 195
+normal i 196
+normal i 197
+normal i 198
+normal i 199
+normal i 200
+normal i 201
+normal i 202
+normal i 203
+normal i 204
+normal i 205
+normal i 206
+normal i 207
+normal i 208
+normal i 209
+normal i 210
+normal i 211
+normal i 212
+normal i 213
+normal i 214
+normal i 215
+normal i 216
+normal i 217
+normal i 218
+normal i 219
+normal i 220
+normal i 221
+normal i 222
+normal i 223
+normal i 224
+normal i 225
+normal i 226
+normal i 227
+normal i 228
+normal i 229
+normal i 230
+normal i 231
+normal i 232
+normal i 233
+normal i 234
+normal i 235
+normal i 236
+normal i 237
+normal i 238
+normal i 239
+normal i 240
+normal i 241
+normal i 242
+normal i 243
+normal i 244
+normal i 245
+normal i 246
+normal i 247
+normal i 248
+normal i 249
+normal i 250
+normal i 251
+normal i 252
+normal i 253
+normal i 254
+normal i 255
+normal i 256
+normal i 257
+normal i 258
+normal i 259
+normal i 260
+normal i 261
+normal i 262
+normal i 263
+normal i 264
+normal i 265
+normal i 266
+normal i 267
+normal i 268
+normal i 269
+normal i 270
+normal i 271
+normal i 272
+normal i 273
+normal i 274
+normal i 275
+normal i 276
+normal i 277
+normal i 278
+normal i 279
+normal i 280
+normal i 281
+normal i 282
+normal i 283
+normal i 284
+normal i 285
+normal i 286
+normal i 287
+normal i 288
+normal i 289
+normal i 290
+normal i 291
+normal i 292
+normal i 293
+normal i 294
+normal i 295
+normal i 296
+normal i 297
+normal i 298
+normal i 299
+normal i 300
+normal i 301
+normal i 302
+normal i 303
+normal i 304
+normal i 305
+normal i 306
+normal i 307
+normal i 308
+normal i 309
+normal i 310
+normal i 311
+normal i 312
+normal i 313
+normal i 314
+normal i 315
+normal i 316
+normal i 317
+normal i 318
+normal i 319
+normal i 320
+normal i 321
+normal i 322
+normal i 323
+normal i 324
+normal i 325
+normal i 326
+normal i 327
+normal i 328
+normal i 329
+normal i 330
+normal i 331
+normal i 332
+normal i 333
+normal i 334
+normal i 335
+normal i 336
+normal i 337
+normal i 338
+normal i 339
+normal i 340
+normal i 341
+normal i 342
+normal i 343
+normal i 344
+normal i 345
+normal i 346
+normal i 347
+normal i 348
+normal i 349
+normal i 350
+normal i 351
+normal i 352
+normal i 353
+normal i 354
+normal i 355
+normal i 356
+normal i 357
+normal i 358
+normal i 359
+normal i 360
+normal i 361
+normal i 362
+normal i 363
+normal i 364
+seizure i 0
+seizure i 1
+seizure i 2
+seizure i 3
+seizure i 4
+seizure i 5
+seizure i 6
+seizure i 7
+seizure i 8
+seizure i 9
+seizure i 10
+seizure i 11
+seizure i 12
+seizure i 13
+seizure i 14
+seizure i 15
+seizure i 16
+seizure i 17
+seizure i 18
+seizure i 19
+seizure i 20
+seizure i 21
+seizure i 22
+seizure i 23
+seizure i 24
+Done reading in 365 no seizure hours and 25 seizure hours
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+Memory usage (GB): 0.795611136
+train_counter_seizure 20 val_counter_seizure 5
+train_counter_normal 292 val_counter_normal 73
+percentiles:
+0 0.0 0.0
+10 192.412426758 176.768930054
+20 459.689099121 442.431689453
+30 658.81307373 637.209912109
+40 846.730224609 819.873974609
+50 1042.01245117 1009.00811768
+60 1261.45869141 1219.99689941
+70 1528.8362793 1476.44569092
+80 1896.24025879 1829.35996094
+90 2539.709375 2448.71398926
+100 29197.0292969 29615.0136719
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+size 18250
+no_normal 365
+no_seizure 25
+no_samples_normal_ph 25
+no_samples_seizure_ph 365
+Histogram:
+[9125 9125]
+magnitudes.shape (18250,)
+labels.shape (18250,)
+Ratio validation: 0.2
+xVal.shape (3650,)
+yVal.shape (3650,)
+xTrain.shape (14600,)
+yTrain.shape (14600,)
+xVal.shape (3650, 2)
+yVal.shape (3650,)
+Saving preprocessed data...
+Building models ...
+Model name for the training phase:  net13
+Model name for the evaluation phase:  net13
+Training model...
+# Neural Network with 95970 learnable parameters
+
+## Layer information
+
+  #    name  size
+---  ------  ---------
+  0          1x192x64
+  1          32x131x66
+  2          32x133x5
+  3          32x133x5
+  4          32x67x3
+  5          32x67x3
+  6          32x67x3
+  7          32x34x2
+  8          2x34x2
+  9          2
+ 10          2
+
+  epoch    trn loss    val loss    trn/val    valid acc  dur
+-------  ----------  ----------  ---------  -----------  -----
+      1     [36m1.04724[0m     [32m0.64728[0m    1.61790      0.64225  7.40s
+      2     [36m0.59052[0m     0.74227    0.79556      0.60253  7.38s
+      3     [36m0.53655[0m     0.65116    0.82400      0.60288  7.44s
+      4     [36m0.50730[0m     [32m0.64032[0m    0.79226      0.59295  7.76s
+      5     [36m0.47462[0m     0.71008    0.66840      0.59603  7.34s
+      6     [36m0.40397[0m     0.81616    0.49496      0.57994  7.74s
+      7     [36m0.33418[0m     1.09581    0.30496      0.51866  8.21s
+      8     [36m0.25245[0m     1.56561    0.16125      0.51147  8.02s
+      9     [36m0.18849[0m     1.25962    0.14964      0.51934  8.00s
+     10     [36m0.13197[0m     2.57917    0.05117      0.50120  8.01s
+     11     [36m0.11364[0m     2.18620    0.05198      0.51010  7.99s
+     12     [36m0.08701[0m     2.36645    0.03677      0.46765  8.00s
+     13     [36m0.08583[0m     2.83179    0.03031      0.49024  7.99s
+     14     [36m0.06850[0m     2.69663    0.02540      0.48134  8.06s
+Early stopping.
+Best valid loss was 0.640322 at epoch 4.
+Loaded parameters to layer 'conv2d1' (shape 32x1x64x1).
+Loaded parameters to layer 'conv2d1' (shape 32).
+Loaded parameters to layer 'conv2d2' (shape 32x32x1x64).
+Loaded parameters to layer 'conv2d2' (shape 32).
+Loaded parameters to layer 'conv2d4' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d4' (shape 32).
+Loaded parameters to layer 'conv2d5' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d5' (shape 32).
+Loaded parameters to layer 'conv2d7' (shape 32x32x3x3).
+Loaded parameters to layer 'conv2d7' (shape 32).
+Loaded parameters to layer 'conv2d8' (shape 2x32x3x3).
+Loaded parameters to layer 'conv2d8' (shape 2).
+Saving model...
+Validating...
+probabilities.shape (3650, 2)
+Showing last 30 test samples..
+Predictions:
+[0 1 0 0 1 0 1 1 1 1 0 1 0 1 0 0 0 1 0 0 1 1 1 1 0 0 1 0 1 1]
+Ground Truth:
+[0 0 0 0 1 0 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 1 0]
+Performance on relevant data
+Accuracy validation:  0.59397260274
+Error rate (%):  40.602739726
+yVal [1 1 0 ..., 0 1 0]
+[[1010  824]
+ [ 658 1158]]
+roc_auc: 0.670270382256
+log_loss 0.639504507066
+Changing batch iterator test:
+Calculating final prediction for the hour long sessions
+magnitudes_normal_val.shape (73, 1, 1406, 64)
+magnitudes_seizure_val.shape (5, 1, 1406, 64)
+[ 0.03289114  0.96711046]
+[ 0.33760503  0.66239488]
+[ 0.1042282   0.89577174]
+[ 0.68841493  0.31158513]
+[ 0.86558223  0.13441777]
+roc_auc for the hours: 0.660273972603
+log_loss for the hours 0.993305604554
+saving predictions to csv file
+hourspatient1_15_net13_10-02-06-33-58.csv
+Accuracy validation for the hours:  0.602564102564
+Calculating the predictions for the test files
+Loading and preprocessing data...
+no_files 2256
+test_magnitude.shape (234, 64)
+(2256, 1, 234, 64)
+Read in dataset from test_2 ...
+read data and preprocess (fft and slicing)
+read in channels [15]
+/home/eavsteen/seizure_detection/data/test_2/2_
+Done reading in 2256 test snippets of 10min.
+Memory usage (GB): 1.089552384
+saving predictions to csv file
+patient1_15_net13_10-02-06-37-02.csv
