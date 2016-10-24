@@ -1138,7 +1138,7 @@ def net_jonas(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.ver
     net = CustomAUCNeuralNet(
         layer,
         update=adam,
-        update_learning_rate=0.001,
+        update_learning_rate=0.0001,
         #update_momentum=0.9,
         regression=False,
         max_epochs=100,
