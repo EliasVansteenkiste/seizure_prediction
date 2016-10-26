@@ -143,7 +143,7 @@ MAX_FLOAT = np.finfo(np.float32).max
 
 class InterpolatedAucObjective():
 
-    def __init__(self):
+    def __init__(self, delta_auc_instead = False):
         """
         These must be kept sorted
         """
@@ -166,6 +166,7 @@ class InterpolatedAucObjective():
         These contain some information for maintaining the lists
         """
         self.N_added = 0
+        self.delta_auc_instead = delta_auc_instead
 
     def auc_error(self, T_prediction, true_label):
         # get TPR1, TPR2, label_1, FPR1, T1, T2 from the estimated distribution
@@ -193,8 +194,11 @@ class InterpolatedAucObjective():
         # Epsilon is a bad solution, it messes up the gradient!
         coef = T.switch(T.eq(T2,T1),0.5*(T_prediction-T1),(T_prediction-T1)/(T2-T1) )
         #coef = (T_prediction-T1)/(T2-T1)
-        AUCt = AUC1 + coef*dAUC
+
         norm = ((self.N_P+l) * (self.N_F+f))
+        if self.delta_auc_instead:
+            return T.switch(T.eq(norm,0.0), 1.0, coef*dAUC/norm)
+        AUCt = AUC1 + coef*dAUC
         return T.switch(T.eq(norm,0.0), 1.0, AUCt/norm)
 
 
