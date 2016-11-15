@@ -7,8 +7,7 @@ from lasagne.updates import nesterov_momentum
 from lasagne.updates import adam
 from custom_net import CustomAUCNeuralNet
 from objectives import binary_crossentropy_with_ranking, bc_with_ranking, InterpolatedAucObjective
-from nolearn.lasagne import BatchIterator
-from nolearn.lasagne import NeuralNet
+from nolearn.lasagne import NeuralNet, BatchIterator, TrainSplit
 import theano
 import theano.tensor as T
 import numpy as np
@@ -47,7 +46,9 @@ he_norm = HeNormal(gain='relu')
 orth = Orthogonal(gain='relu')
 
 
-def net0(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net0(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -73,11 +74,14 @@ def net0(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net1(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net1(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -103,11 +107,14 @@ def net1(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net2(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net2(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(33,3), pad=(16,1), num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(33,3), pad=(16,1), num_filters=64)
@@ -137,10 +144,13 @@ def net2(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net3(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net3(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -166,11 +176,15 @@ def net3(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net4(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net4(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):  
+
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -196,10 +210,14 @@ def net4(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net5(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net5(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -223,10 +241,14 @@ def net5(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net6(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net6(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -256,10 +278,14 @@ def net6(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         verbose=1,
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net7(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net7(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -293,10 +319,14 @@ def net7(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=5),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net8(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net8(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -334,11 +364,15 @@ def net8(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         verbose=1,
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net9(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net9(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -365,10 +399,14 @@ def net9(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_lea
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net10(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net10(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    
     layer = InputLayer(shape=(None, n_channels, width, height), name="input")
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64, name="conv2d_1")
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64, name="conv2d_2")
@@ -395,11 +433,14 @@ def net10(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=4),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 he_norm = HeNormal(gain='relu')
-def wideResNet1(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+def wideResNet1(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
     '''
     Adapted from https://github.com/Lasagne/Recipes/tree/master/papers/deep_residual_learning.
     Tweaked to be consistent with 'Identity Mappings in Deep Residual Networks', Kaiming He et al. 2016 (https://arxiv.org/abs/1603.05027)
@@ -496,12 +537,15 @@ def wideResNet1(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlin
         on_epoch_finished=[EarlyStopping(patience=5),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
 
     return net
 
 
-def wideResNet0(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+def wideResNet0(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
     '''
     Adapted from https://github.com/Lasagne/Recipes/tree/master/papers/deep_residual_learning.
     Tweaked to be consistent with 'Identity Mappings in Deep Residual Networks', Kaiming He et al. 2016 (https://arxiv.org/abs/1603.05027)
@@ -595,11 +639,14 @@ def wideResNet0(n_channels,width,height,n_output=2, n=1, k=1,nonlinearity=nonlin
         on_epoch_finished=[EarlyStopping(patience=5),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
 
     return net
 
-def net11(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net11(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
@@ -623,11 +670,14 @@ def net11(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net12(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net12(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=64)
@@ -651,11 +701,14 @@ def net12(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net13(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net13(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(64,1), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,64), pad=1, num_filters=32)
@@ -679,10 +732,13 @@ def net13(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net14(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net14(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -708,10 +764,13 @@ def net14(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net15(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net15(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -738,10 +797,13 @@ def net15(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net16(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net16(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(64,1), pad=0, num_filters=32)
     layer = dropout(layer,p=0.1)
@@ -768,10 +830,13 @@ def net16(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net17(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net17(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -799,10 +864,13 @@ def net17(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net18(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net18(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(32,1), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,128), pad=(1,63), num_filters=32)
@@ -826,10 +894,13 @@ def net18(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net19(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net19(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,64), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
@@ -853,10 +924,13 @@ def net19(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net20(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net20(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -884,11 +958,14 @@ def net20(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net21(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net21(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -917,10 +994,13 @@ def net21(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net22(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net22(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -948,10 +1028,13 @@ def net22(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net23(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net23(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -979,10 +1062,13 @@ def net23(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net24(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net24(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     input_l = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,63), pad=(31,0), num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
@@ -1027,10 +1113,13 @@ def net24(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net25(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net25(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(64,1), stride=(8,1), pad=(16,0), num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,64), stride=(1,8), pad=(0,16), num_filters=32)
@@ -1054,11 +1143,14 @@ def net25(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 #closely related to net11
-def net26(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net26(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1084,11 +1176,14 @@ def net26(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 #closely related to net13
-def net27(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net27(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(64,1), pad=1, num_filters=32)
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(1,64), pad=1, num_filters=32)
@@ -1113,11 +1208,14 @@ def net27(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 #closely related to net14
-def net28(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net28(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -1144,10 +1242,13 @@ def net28(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net11_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
+def net11_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):
 
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, filter_size=(3,3), pad=1, num_filters=32)
@@ -1176,12 +1277,15 @@ def net11_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.ve
         on_epoch_finished=[auc_objective.remove_all_points, EarlyStopping(patience=10)],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
 
-def net29(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net29(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net11 with he normalization
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1206,10 +1310,13 @@ def net29(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net29_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net29_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net11 with he normalization
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1238,11 +1345,14 @@ def net29_jauc(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.ve
         on_epoch_finished=[auc_objective.remove_all_points, EarlyStopping(patience=10)],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net30(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net30(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net11 with he normalization and hinge loss objective
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1268,11 +1378,14 @@ def net30(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
 
-def net31(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net31(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #net13 with he normalization
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(64,1), pad=1, num_filters=32)
@@ -1297,10 +1410,13 @@ def net31(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net32(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net32(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -1326,10 +1442,13 @@ def net32(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net33(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net33(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #net20 with henorm
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1358,10 +1477,13 @@ def net33(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net34(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net34(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #net18 with henorm
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(32,1), pad=1, num_filters=32)
@@ -1386,10 +1508,13 @@ def net34(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net35(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net35(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29 with more filters
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1414,10 +1539,13 @@ def net35(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net36(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net36(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net11 with he normalization
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
@@ -1445,10 +1573,13 @@ def net36(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net37(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net37(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -1476,10 +1607,13 @@ def net37(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net38(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net38(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
     layer = dropout(layer,p=0.2)
@@ -1507,10 +1641,13 @@ def net38(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net39(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net39(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net11 with orthogonal normalization
     layer = InputLayer(shape=(None, n_channels, width, height))
     layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=orth, filter_size=(3,3), pad=1, num_filters=32)
@@ -1535,10 +1672,13 @@ def net39(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net40(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net40(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1566,10 +1706,13 @@ def net40(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net41(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net41(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1597,10 +1740,13 @@ def net41(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net42(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net42(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1630,10 +1776,13 @@ def net42(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net43(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net43(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1665,10 +1814,13 @@ def net43(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net44(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net44(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1700,10 +1852,13 @@ def net44(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net45(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net45(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1735,10 +1890,13 @@ def net45(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net46(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net46(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1770,10 +1928,13 @@ def net46(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net
 
-def net47   (n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+def net47   (n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
     #from net29  seperate input layers for each channel
     layer = InputLayer(shape=(None, n_channels, width, height))
     # channel reduction == feature map reduction
@@ -1805,5 +1966,108 @@ def net47   (n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very
         on_epoch_finished=[EarlyStopping(patience=10),],
         batch_iterator_train = batch_iterator_train,
         batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
+    )
+    return net
+
+def Tmean2(t,axis):
+    return T.mean(t**2,axis=axis)
+
+def net48(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net290 with different pool function in the globalpoollqyer
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer,pool_function=Tmean2)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
+    )
+    return net
+
+def Tmean3(t,axis):
+    return T.mean(t**3,axis=axis)
+
+def net49(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net290 with different pool function in the globalpoollqyer
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer,pool_function=Tmean3)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
+    )
+    return net
+
+def Tmean4(t,axis):
+    return T.mean(t**4,axis=axis)
+
+def net50(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net290 with different pool function in the globalpoollqyer
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(3,3), pad=1, num_filters=32)
+    layer = dropout(layer,p=0.5)
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, stride=(2,2), filter_size=(3,3), pad=1, num_filters=32)
+    layer = Conv2DLayer(layer, nonlinearity=None, W=he_norm, filter_size=(3,3), pad=1, num_filters=n_output)
+    layer = GlobalPoolLayer(layer,pool_function=Tmean4)
+    layer = NonlinearityLayer(layer,nonlinearity=nonlinearities.softmax)
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
     )
     return net

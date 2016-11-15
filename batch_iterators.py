@@ -14,534 +14,6 @@ def _sldict(arr, sl):
     else:
         return arr[sl]
 
-class BI_skip_droput_train(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, shuffle=False, seed=42):
-
-		self.batch_size = batch_size
-		self.shuffle = shuffle
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-
-
-	def transform(self, Xb, yb):
-
-		Xb, yb = super(BI_skip_droput_train, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			if yb[idx]:
-				best = -1
-				best_border=100
-				hour = int(math.floor(np.random.random_sample() * g.magnitudes_seizure_train.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(g.magnitudes_seizure_train.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_seizure_train[hour, :, start:start+self.magnitude_window]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-			else:
-				best = -1
-				best_border=100
-				hour = int(math.floor(np.random.random_sample() * g.magnitudes_normal_train.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(g.magnitudes_normal_train.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_normal_train[hour, :, start:start+self.magnitude_window]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_skip_droput_test(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, shuffle=False, seed=42):
-
-		self.batch_size = batch_size
-		self.shuffle = shuffle
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-
-	def transform(self, Xb, yb):
-
-		Xb, yb = super(BI_skip_droput_test, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			label = None
-			x_rand = None
-			if yb != None:
-				label = yb[idx]
-				x_rand = Xb[idx]
-			else:
-				label = Xb[idx,1]
-				x_rand = Xb[idx,0]
-			if label:
-				best = -1
-				best_border=100
-				hour = int(math.floor(x_rand * g.magnitudes_seizure_val.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(g.magnitudes_seizure_val.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_seizure_val[hour, :, start:start+self.magnitude_window]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-			else:
-				best = -1
-				best_border=100
-				hour = int(math.floor(x_rand * g.magnitudes_normal_val.shape[0]))
-				for k in range(self.no_trials):
-					r = xrange(g.magnitudes_normal_val.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_normal_val[hour, :, start:start+self.magnitude_window]
-					twop = np.percentile(slice,2)
-					if twop>0.1:
-						best = slice
-						break
-					else:
-						border = scipy.stats.percentileofscore(slice,0.0000001)
-						if border<best_border:
-							best_border = border
-							best = slice
-				Xb_new[idx] = best
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-
-class BI_train(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, shuffle=False, seed=42):
-
-		self.batch_size = batch_size
-		self.shuffle = shuffle
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-
-	def transform(self, Xb, yb):
-
-		Xb, yb = super(BI_train, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			if yb[idx]:
-				hour = int(math.floor(np.random.random_sample() * g.magnitudes_seizure_train.shape[0]))
-				r = xrange(g.magnitudes_seizure_train.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_seizure_train[hour, :, start:start+self.magnitude_window]
-				Xb_new[idx] = slice
-			else:
-				hour = int(math.floor(np.random.random_sample() * g.magnitudes_normal_train.shape[0]))
-				r = xrange(g.magnitudes_normal_train.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_normal_train[hour, :, start:start+self.magnitude_window]
-				Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_test(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, shuffle=False, seed=42):
-
-		self.batch_size = batch_size
-		self.shuffle = shuffle
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-
-	def transform(self, Xb, yb):
-
-		Xb, yb = super(BI_test, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			label = None
-			x_rand = None
-			if yb != None:
-				label = yb[idx]
-				x_rand = Xb[idx]
-			else:
-				label = Xb[idx,1]
-				x_rand = Xb[idx,0]
-			if label:
-				hour = int(math.floor(x_rand * g.magnitudes_seizure_val.shape[0]))
-				r = xrange(g.magnitudes_seizure_val.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_seizure_val[hour, :, start:start+self.magnitude_window]
-				Xb_new[idx] = slice
-			else:
-				hour = int(math.floor(x_rand * g.magnitudes_normal_val.shape[0]))
-				r = xrange(g.magnitudes_normal_val.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_normal_val[hour, :, start:start+self.magnitude_window]
-				Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_train_balanced(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, seed=42):
-
-		self.batch_size = batch_size
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-		self.shuffle = False
-
-	def __call__(self, X, y=None):
-		self.y = y
-		#print "BI_train_balanced called with len(X) =",len(X) 
-		self.X = np.arange(len(X))
-		return self
-
-
-	def transform(self, Xb, yb):
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			hour = Xb[idx]
-			slice = None
-			if yb[idx]:
-				hour = hour % g.magnitudes_seizure_train.shape[0]
-				r = xrange(g.magnitudes_seizure_train.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_seizure_train[hour, :, start:start+self.magnitude_window]
-			else:
-				hour = hour % g.magnitudes_normal_train.shape[0]
-				r = xrange(g.magnitudes_normal_train.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_normal_train[hour, :, start:start+self.magnitude_window]
-			Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_test_balanced(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, seed=42):
-
-		self.batch_size = batch_size
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-		self.shuffle = False
-
-	def __call__(self, X, y=None):
-		self.y = y
-		self.X = np.arange(len(X))
-		self.X_orig = X
-		return self
-
-	def __iter__(self):
-		bs = self.batch_size
-		for i in range((self.n_samples + bs - 1) // bs):
-			sl = slice(i * bs, (i + 1) * bs)
-			Xb = _sldict(self.X, sl)
-			Xb_orig = _sldict(self.X_orig, sl) 
-			if self.y is not None:
-				yb = _sldict(self.y, sl)
-			else:
-				yb = None
-			yield self.transform(Xb, yb, Xb_orig)
-
-	def transform(self, Xb, yb, Xb_orig):
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			label = None
-			hour = None
-			if yb != None:
-				label = yb[idx]
-				hour = Xb[idx] 
-			else:
-				label = Xb_orig[idx,1]
-				hour = Xb[idx]
-			if label:
-				hour = hour % g.magnitudes_seizure_val.shape[0]
-				r = xrange(g.magnitudes_seizure_val.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_seizure_val[hour, :, start:start+self.magnitude_window]
-			else:
-				hour = hour % g.magnitudes_normal_val.shape[0]
-				r = xrange(g.magnitudes_normal_val.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_normal_val[hour, :, start:start+self.magnitude_window]
-			Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
-class BI_train_sch(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, seed=42):
-
-		self.batch_size = batch_size
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-		self.shuffle = False
-
-	def __call__(self, X, y=None):
-		self.y = y
-		#print "BI_train_balanced called with len(X) =",len(X) 
-		self.X = np.arange(len(X))
-		return self
-
-
-	def transform(self, Xb, yb):
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs*g.args.no_channels,1,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-		yb_new = np.empty((bs*g.args.no_channels),dtype=np.int32)
-
-		for idx in range(bs):
-			hour = Xb[idx]
-			for ch in range(g.args.no_channels):
-				slice = None
-				if yb[idx]:
-					hour = hour % g.magnitudes_seizure_train.shape[0]
-					r = xrange(g.magnitudes_seizure_train.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_seizure_train[hour,ch,start:start+self.magnitude_window]
-				else:
-					hour = hour % g.magnitudes_normal_train.shape[0]
-					r = xrange(g.magnitudes_normal_train.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_normal_train[hour,ch, start:start+self.magnitude_window]
-				Xb_new[idx*g.args.no_channels+ch] = slice
-				yb_new[idx*g.args.no_channels+ch] = yb[idx]
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb_new
-
-class BI_test_sch(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, seed=42):
-
-		self.batch_size = batch_size
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-		self.shuffle = False
-
-	def __call__(self, X, y=None):
-		self.y = y
-		self.X = np.arange(len(X))
-		self.X_orig = X
-		return self
-
-	def __iter__(self):
-		bs = self.batch_size
-		for i in range((self.n_samples + bs - 1) // bs):
-			sl = slice(i * bs, (i + 1) * bs)
-			Xb = _sldict(self.X, sl)
-			Xb_orig = _sldict(self.X_orig, sl) 
-			if self.y is not None:
-				yb = _sldict(self.y, sl)
-			else:
-				yb = None
-			yield self.transform(Xb, yb, Xb_orig)
-
-	def transform(self, Xb, yb, Xb_orig):
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs*g.args.no_channels,1,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-		yb_new = None
-		if yb != None:
-			yb_new = np.empty((bs*g.args.no_channels),dtype=np.int32) 
-		else:
-			yb_new = yb
-
-		for idx in range(bs):
-			label = None
-			hour = None
-			if yb != None:
-				label = yb[idx]
-				hour = Xb[idx] 
-			else:
-				label = Xb_orig[idx,1]
-				hour = Xb[idx]
-			for ch in range(g.args.no_channels):
-				if label:
-					hour = hour % g.magnitudes_seizure_val.shape[0]
-					r = xrange(g.magnitudes_seizure_val.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_seizure_val[hour, ch, start:start+self.magnitude_window]
-				else:
-					hour = hour % g.magnitudes_normal_val.shape[0]
-					r = xrange(g.magnitudes_normal_val.shape[2]-self.magnitude_window)
-					start = np.random.choice(r)
-					slice = g.magnitudes_normal_val[hour, ch, start:start+self.magnitude_window]
-				Xb_new[idx*g.args.no_channels+ch] = slice
-				if yb != None:
-					yb_new[idx*g.args.no_channels+ch] = yb[idx]
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb_new
-
-class BI_test_sch_sch(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, channel, seed=42):
-
-		self.batch_size = batch_size
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-		self.shuffle = False
-		self.ch = channel
-
-	def __call__(self, X, y=None):
-		self.y = y
-		self.X = np.arange(len(X))
-		self.X_orig = X
-		return self
-
-	def __iter__(self):
-		bs = self.batch_size
-		for i in range((self.n_samples + bs - 1) // bs):
-			sl = slice(i * bs, (i + 1) * bs)
-			Xb = _sldict(self.X, sl)
-			Xb_orig = _sldict(self.X_orig, sl) 
-			if self.y is not None:
-				yb = _sldict(self.y, sl)
-			else:
-				yb = None
-			yield self.transform(Xb, yb, Xb_orig)
-
-	def transform(self, Xb, yb, Xb_orig):
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,1,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			label = None
-			hour = None
-			if yb != None:
-				label = yb[idx]
-				hour = Xb[idx] 
-			else:
-				label = Xb_orig[idx,1]
-				hour = Xb[idx]
-			if label:
-				hour = hour % g.magnitudes_seizure_val.shape[0]
-				r = xrange(g.magnitudes_seizure_val.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_seizure_val[hour, self.ch, start:start+self.magnitude_window]
-			else:
-				hour = hour % g.magnitudes_normal_val.shape[0]
-				r = xrange(g.magnitudes_normal_val.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_normal_val[hour, self.ch, start:start+self.magnitude_window]
-			Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
-
 class BI_train_bal_complete(BatchIterator):
 
 	no_trials = 20
@@ -551,7 +23,7 @@ class BI_train_bal_complete(BatchIterator):
 		self.batch_size = batch_size
 		self.random = np.random.RandomState(seed)
 		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
+		self.m_window = preprocess_params['magnitude_window']
 		self.ceil = preprocess_params['ceil']
 		self.floor = preprocess_params['floor']
 		self.shuffle = False
@@ -565,6 +37,7 @@ class BI_train_bal_complete(BatchIterator):
 
 	def transform(self, Xb, yb):
 
+		#print 'transforming batch'
 		# Select and normalize:
 		bs = Xb.shape[0]
 		Xb_new = []
@@ -574,27 +47,41 @@ class BI_train_bal_complete(BatchIterator):
 			hour = Xb[idx]
 			slice = None
 			if yb[idx]:
-				hour = hour % g.magnitudes_seizure_train.shape[0]
-				r = xrange(self.magnitude_window)
-				start = np.random.choice(r)
-				for pos in range(start,g.magnitudes_seizure_train.shape[2]-self.magnitude_window+1,self.magnitude_window):
-					slice = g.magnitudes_seizure_train[hour, :, pos:pos+self.magnitude_window]
+				hour = hour % (g.ms_seizure_train.shape[0]+g.ms_xtra_seizure_train.shape[0])				#print 'seizure', hour
+				if hour >= g.ms_seizure_train.shape[0]:
+					#select extra samples
+					hour = hour - g.ms_seizure_train.shape[0]
+					r = range(g.ms_xtra_seizure_train.shape[2]-self.m_window)
+					start = np.random.choice(r)
+					slice = g.ms_xtra_seizure_train[hour, :, start:start+self.m_window]
 					Xb_new.append(slice)
 					yb_new.append(yb[idx])
+				else:
+					r = xrange(self.m_window)
+					start = np.random.choice(r)
+					for pos in range(start,g.ms_seizure_train.shape[2]-self.m_window+1,self.m_window):
+						slice = g.ms_seizure_train[hour, :, pos:pos+self.m_window]
+						Xb_new.append(slice)
+						yb_new.append(yb[idx])
+
+
 			else:
-				hour = hour % g.magnitudes_normal_train.shape[0]
-				r = xrange(self.magnitude_window)
+				hour = hour % g.ms_normal_train.shape[0]
+				#print 'normal', hour
+				# if not g.blacklist_normal_train[hour]:
+				r = xrange(self.m_window)
 				start = np.random.choice(r)
-				for pos in range(start,g.magnitudes_normal_train.shape[2]-self.magnitude_window+1,self.magnitude_window):
-					slice = g.magnitudes_normal_train[hour, :, pos:pos+self.magnitude_window]
+				for pos in range(start,g.ms_normal_train.shape[2]-self.m_window+1,self.m_window):
+					slice = g.ms_normal_train[hour, :, pos:pos+self.m_window]
 					Xb_new.append(slice)
 					yb_new.append(yb[idx])
+				# else:
+				# 	print 'blacklist_normal_train blocked', hour
+
 		Xb_new = np.stack(Xb_new)
 		Xb_new = normalize(Xb_new)
 		Xb_new = Xb_new.astype(np.float32)
 		return Xb_new, np.stack(yb_new)
-
-
 
 class BI_test_bal_complete(BatchIterator):
 
@@ -605,7 +92,7 @@ class BI_test_bal_complete(BatchIterator):
 		self.batch_size = batch_size
 		self.random = np.random.RandomState(seed)
 		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
+		self.m_window = preprocess_params['magnitude_window']
 		self.ceil = preprocess_params['ceil']
 		self.floor = preprocess_params['floor']
 		self.shuffle = False
@@ -646,126 +133,120 @@ class BI_test_bal_complete(BatchIterator):
 				label = Xb_orig[idx,1]
 				hour = Xb[idx]
 			if label:
-				hour = hour % g.magnitudes_seizure_val.shape[0]
-				r = xrange(self.magnitude_window)
+				hour = hour % g.ms_seizure_val.shape[0]
+				# if not g.blacklist_seizure_val[hour]:
+				r = xrange(self.m_window)
 				start = np.random.choice(r)
-				for pos in range(start,g.magnitudes_seizure_val.shape[2]-self.magnitude_window+1,self.magnitude_window):
-					slice = g.magnitudes_seizure_val[hour, :, pos:pos+self.magnitude_window]
+				for pos in range(start,g.ms_seizure_val.shape[2]-self.m_window+1,self.m_window):
+					slice = g.ms_seizure_val[hour, :, pos:pos+self.m_window]
 					Xb_new.append(slice)
 					yb_new.append(yb[idx])
+				# else:
+				# 	print 'blacklist_seizure_val blocked', hour
 			else:
-				hour = hour % g.magnitudes_normal_val.shape[0]
-				r = xrange(self.magnitude_window)
+				hour = hour % g.ms_normal_val.shape[0]
+				# if not g.blacklist_normal_val[hour]:
+				r = xrange(self.m_window)
 				start = np.random.choice(r)
-				for pos in range(start,g.magnitudes_normal_val.shape[2]-self.magnitude_window+1,self.magnitude_window):
-					slice = g.magnitudes_normal_val[hour, :, pos:pos+self.magnitude_window]
+				for pos in range(start,g.ms_normal_val.shape[2]-self.m_window+1,self.m_window):
+					slice = g.ms_normal_val[hour, :, pos:pos+self.m_window]
 					Xb_new.append(slice)
 					yb_new.append(yb[idx])
+				# else:
+				# 	print 'blacklist_normal_val blocked', hour
 
 		Xb_new = normalize(np.stack(Xb_new))
 		Xb_new = Xb_new.astype(np.float32)
 		return Xb_new, np.stack(yb_new)
 
 
-class BI_train_balc_dropout(BatchIterator):
-
-	no_trials = 20
+class BI_new(BatchIterator):
 
 	def __init__(self, batch_size, seed=42):
 
 		self.batch_size = batch_size
 		self.random = np.random.RandomState(seed)
 		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
+		self.m_window = preprocess_params['magnitude_window']
 		self.ceil = preprocess_params['ceil']
 		self.floor = preprocess_params['floor']
 		self.shuffle = False
 
 	def __call__(self, X, y=None):
-		self.y = y
-		#print "BI_train_bal_complete called with len(X) =",len(X) 
-		self.X = np.arange(len(X))
+		if y == None:
+			self.y = y 
+		else:
+			self.y = y[0]
+		print X
+		self.X = X
 		return self
+
+	def __iter__(self):
+		bs = self.batch_size
+		n_normal = len(self.X['normal'])
+		n_seizure = len(self.X['seizure'])
+		n_xtra_seizure = len(self.X['xtra_seizure'])
+
+		n_max = max([n_normal, n_seizure, n_xtra_seizure])
+
+		if bs > n_max:
+			print 'Warning: batch size is larger than the no. normal, seizure and xtra_seizure files.\nSo it does not make sense to increase batch size further'
+
+		for i in range((n_max + bs - 1) // bs):
+			Xb = np.empty((3,bs),dtype=np.int32)
+			yb = np.empty((3,bs),dtype=np.int32)
+			for j in range(bs):
+				idx = i*bs+j
+				if idx >= n_normal:
+					Xb[0,j] = np.random.choice(self.X['normal'])
+				else:
+					Xb[0,j] = self.X['normal'][idx]
+				yb[0,j] = 0
+				if idx >= n_seizure:
+					Xb[1,j] = np.random.choice(self.X['seizure'])
+				else:
+					Xb[1,j] = self.X['seizure'][idx]
+				yb[1,j] = 1
+				if idx >= n_xtra_seizure:
+					Xb[2,j] = np.random.choice(self.X['xtra_seizure'])
+				else:
+					Xb[2,j] = self.X['xtra_seizure'][idx]
+				yb[2,j] = 1
+			yield self.transform(Xb, yb)
 
 
 	def transform(self, Xb, yb):
 
-		# Select and normalize:
 		bs = Xb.shape[0]
 		Xb_new = []
 		yb_new = []
 
 		for idx in range(bs):
-			hour = Xb[idx]
-			slice = None
-			if yb[idx]:
-				hour = hour % g.magnitudes_seizure_train.shape[0]
-				r = xrange(self.magnitude_window)
-				start = np.random.choice(r)
-				for pos in range(start,g.magnitudes_seizure_train.shape[2]-self.magnitude_window+1,self.magnitude_window):
-					slice = g.magnitudes_seizure_train[hour, :, pos:pos+self.magnitude_window]
-					start_of_dropout = random.randint(0,self.magnitude_window-2)
-					end_of_dropout = random.randint(start_of_dropout,self.magnitude_window-1)
-					slice = np.copy(slice)
-					shape = slice[0,:,start_of_dropout:end_of_dropout].shape
-					slice[0,:,start_of_dropout:end_of_dropout] = np.zeros(shape)
-					Xb_new.append(slice)
-					yb_new.append(yb[idx])
-			else:
-				hour = hour % g.magnitudes_normal_train.shape[0]
-				r = xrange(self.magnitude_window)
-				start = np.random.choice(r)
-				for pos in range(start,g.magnitudes_normal_train.shape[2]-self.magnitude_window+1,self.magnitude_window):
-					slice = g.magnitudes_normal_train[hour, :, pos:pos+self.magnitude_window]
-					start_of_dropout = random.randint(0,self.magnitude_window-2)
-					end_of_dropout = random.randint(start_of_dropout,self.magnitude_window-1)
-					slice = np.copy(slice)
-					shape = slice[0,:,start_of_dropout:end_of_dropout].shape
-					slice[0,:,start_of_dropout:end_of_dropout] = np.zeros(shape)
-					Xb_new.append(slice)
-					yb_new.append(yb[idx])
+			# Normal samples
+			r = xrange(self.m_window)
+			start = np.random.choice(r)
+			for pos in range(start,g.ms_normal.shape[2]-self.m_window+1,self.m_window):
+				slice = g.ms_normal[Xb[0,idx], :, pos:pos+self.m_window]
+				Xb_new.append(slice)
+				yb_new.append(0)
+			# Seizure samples
+			r = xrange(self.m_window)
+			start = np.random.choice(r)
+			for pos in range(start,g.ms_seizure.shape[2]-self.m_window+1,self.m_window):
+				slice = g.ms_seizure[Xb[1,idx], :, pos:pos+self.m_window]
+				Xb_new.append(slice)
+				yb_new.append(1)
+			# Extra seizure samples
+			r = xrange(g.ms_xtra_seizure.shape[2]-self.m_window)
+			start = np.random.choice(r)
+			slice = g.ms_xtra_seizure[Xb[2,idx], :, start:start+self.m_window]
+			Xb_new.append(slice)
+			yb_new.append(1)
+
 		Xb_new = np.stack(Xb_new)
-		Xb_new = normalize(Xb_new)
+		yb_new = np.stack(yb_new)
+		
 		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, np.stack(yb_new)
+		yb_new = yb_new.astype(np.int32)
 
-class BI_train_random(BatchIterator):
-
-	no_trials = 20
-
-	def __init__(self, batch_size, shuffle=False, seed=42):
-
-		self.batch_size = batch_size
-		self.shuffle = shuffle
-		self.random = np.random.RandomState(seed)
-		preprocess_params = g.cfg['preprocess']
-		self.magnitude_window = preprocess_params['magnitude_window']
-		self.ceil = preprocess_params['ceil']
-		self.floor = preprocess_params['floor']
-
-	def transform(self, Xb, yb):
-
-		Xb, yb = super(BI_train, self).transform(Xb, yb)
-
-		# Select and normalize:
-		bs = Xb.shape[0]
-		new_shape = (bs,g.args.no_channels,self.magnitude_window,self.ceil-self.floor)
-		Xb_new = np.empty(new_shape)
-
-		for idx in range(bs):
-			if yb[idx]:
-				hour = int(math.floor(np.random.random_sample() * g.magnitudes_seizure_train.shape[0]))
-				r = xrange(g.magnitudes_seizure_train.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_seizure_train[hour, :, start:start+self.magnitude_window]
-				Xb_new[idx] = slice
-			else:
-				hour = int(math.floor(np.random.random_sample() * g.magnitudes_normal_train.shape[0]))
-				r = xrange(g.magnitudes_normal_train.shape[2]-self.magnitude_window)
-				start = np.random.choice(r)
-				slice = g.magnitudes_normal_train[hour, :, start:start+self.magnitude_window]
-				Xb_new[idx] = slice
-
-		Xb_new = normalize(Xb_new)
-		Xb_new = Xb_new.astype(np.float32)
-		return Xb_new, yb
+		return Xb_new, yb_new

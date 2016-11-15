@@ -35,7 +35,7 @@ def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, over
 			magnitude = calcFFT(sample[:,ch],fft_width,overlap)[:,:height]
 			fig = plt.figure()
 			plt.imshow(np.flipud(magnitude.transpose()),vmin=20 , vmax=4000, aspect='auto', interpolation='none')
-			fig.savefig( 'figures/'+savedir+'/ch'+str(ch)+'/test'+str(i)+suffix+'.png')
+			fig.savefig( savedir+'/ch'+str(ch)+'/test'+str(i)+suffix+'.png')
 		plt.close('all')
 		# print "m0", np.amin(magnitude0), np.amax(magnitude0), np.mean(magnitude0), np.average(magnitude0)
 		# print "m1", np.amin(magnitude1), np.amax(magnitude1), np.mean(magnitude1), np.average(magnitude1)
@@ -125,11 +125,16 @@ def analyze(basename, suffix, savedir, start, no_of_samples, fft_width=512, over
 
 def read_data_1h(basename, suffix, start):
 	sample = np.zeros((0,16))
+	filename = basename+'1'+suffix
+	test_slice = mat_to_nparray(filename)
+	shape = test_slice.shape
+
 	for k in range(6):
 		filename = basename+str(start+k)+suffix
 		slice = mat_to_nparray(filename)
 		no_channels = slice.shape[1]
 		sample = np.vstack((sample,slice))
+	
 	return sample
 
 def read_data(basename, suffix, start):

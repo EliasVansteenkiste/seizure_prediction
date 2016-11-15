@@ -1,4 +1,3 @@
-#!/home/robo_external/.local/bin python
 # -*- coding: utf-8 -*-
 
 import global_vars as g
@@ -55,7 +54,7 @@ parser.add_argument('--no-shuffle-before-split', dest='shuffle_before_split', ac
 parser.add_argument('--no-save-model', dest='no_save_model', action='store_true', default=False,
                    help='don\'t save the model after training. saves some time (default: false)')
 parser.add_argument('--fixed-seed', dest='fixed_seed', action='store_true', default=True,
-                   help='fixed random seed. (default: false)')
+                   help='fixed random seed. (default: True)')
 parser.add_argument('--plot-prob-dist', dest='plot_prob_dist', action='store_true', default=False,
                    help='Plot the distribution of the predicted probabilities for both wrongly and rightly predicted samples. (default: false)')
 parser.add_argument('--exclude-user', dest='exclude_user', action='append', default=[],
@@ -77,7 +76,14 @@ parser.add_argument('--mode', dest='mode', action='store', default="None",
 parser.add_argument('--patients', dest='patients', nargs='+', default=['patient0'],
 					help='the target patients')
 parser.add_argument('--no-predict-test', dest='no_predict_test', action='store_true', default=False,
-                   help='do not calculate the predictions for the test set. (default: false)')
+                   help='no prediction of the competition test set. (default: False)')
+
+#Added to deal with Kaggle's fuckup
+parser.add_argument('--labels', dest='labels', action='store', default="train_and_test_data_labels_safe.csv",
+                   help='labels and safe flags (default: train_and_test_data_labels_safe.csv)')
+parser.add_argument('--new-data', dest='new_data', action='store', default="train_and_test_data_labels_new.csv",
+                   help='new data csv (default: train_and_test_data_labels_new.csv)')
+
 
 
 g.args = parser.parse_args()
@@ -116,15 +122,15 @@ floor = preprocess_params['floor']
 ceil = preprocess_params['ceil']
 fft_width = preprocess_params['fft_width']
 overlap = preprocess_params['overlap']
-magnitude_window = preprocess_params['magnitude_window']
+m_window = preprocess_params['magnitude_window']
 include_userdata = preprocess_params['include_userdata']
 
 height=fft_width/2
 assert ceil-floor <= fft_width / 2
 assert ceil <= fft_width / 2
 
-global patients
-patients = dict()
+global chs
+chs = dict()
 
 print args.patients
 print type(args.patients)
@@ -135,73 +141,192 @@ for i in range(len(args.patients)):
 	channels = np.empty((args.no_channels),dtype=np.int32)
 	for ch in range(args.no_channels):
 		channels[ch] = int(words[ch+1])
-	patients[user]=channels
+	chs[user]=channels
 
 for dataset in datasets.all:
-	if dataset.user in patients.keys():
+	if dataset.user in chs.keys():
 		dataset.enabled = True
 	else:
 		dataset.enabled = False
 
+global legal_seizure_files
+legal_seizure_files = dict()
+global legal_normal_files
+legal_normal_files = dict()
 
-def read_train_data(dataset,k_normal_val,k_normal_train,k_seizure_val,k_seizure_train):
-	global train_counter_seizure
-	global val_counter_seizure
-	global train_counter_normal
-	global val_counter_normal
-	global patients
+blacklist = []
+with open('./'+args.labels) as f:
+	for line in f:
+	 	words = line.rsplit()[0].split(',')
+	 	#only keep the safe files
+		if words[2] == '1':
+			if words[1] == '0':
+				patient = 'patient'+words[0].split('_')[0]
+				if patient in legal_normal_files:
+					legal_normal_files[patient].append(words[0])
+				else:
+					legal_normal_files[patient] = []
+			else:
+				patient = 'patient'+words[0].split('_')[0]
+				if patient in legal_seizure_files:
+					legal_seizure_files[patient].append(words[0])
+				else:
+					legal_seizure_files[patient] = []
+		else:
+			blacklist.append(words[0])
+
+print 'legal_seizure_files'
+for patient in legal_seizure_files.keys():
+	print patient, ': ', len(legal_seizure_files[patient])
+	for dataset in datasets.all:
+		if dataset.user == patient and dataset.trainset:
+			dataset.no_seizure_files_clean = len(legal_seizure_files[patient])
+			print 'dataset.no_seizure_files_clean', dataset.no_seizure_files_clean
+			dataset.no_seizure_clean = dataset.no_seizure_files_clean/6
+			print 'dataset.no_seizure_clean', dataset.no_seizure_clean
+
+print 'legal_normal_files'
+for patient in legal_normal_files.keys():
+	print patient, ': ', len(legal_normal_files[patient])
+	for dataset in datasets.all:
+		if dataset.user == patient and dataset.trainset:
+			dataset.no_normal_files_clean = len(legal_normal_files[patient])
+			dataset.no_normal_clean = dataset.no_normal_files_clean/6
+
+
+def read_train_data(dataset,no_normal,no_seizure):
+	global counter_seizure
+	global counter_normal
 
 	print "read data and preprocess (fft and slicing)"
-	channels = patients[dataset.user]
+	channels = chs[dataset.user]
+	print "read in channels", channels
+	
+	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
+	print path
+
+	# read in normal
+	counter = 0
+	print 'dataset.no_normal', dataset.no_normal
+	print 'no_normal', no_normal
+	for i in xrange(dataset.no_normal):
+		print "normal i", i, 
+		sys.stdout.flush()
+		filename = dataset.base_name + str(i*6+1) + '_0.mat'
+		if filename in legal_normal_files[dataset.user]:
+			data_1h = read_data_1h(path,'_0.mat',i*6+1)
+			ch_arrays = []
+			for ch in channels:
+				ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
+			magnitude = np.stack(ch_arrays, axis=0)
+			print 'counter', counter
+			g.ms_normal[counter_normal] = magnitude
+			counter_normal += 1
+			counter += 1
+		print counter, no_normal
+		if counter >= no_normal:
+			break;
+
+	# read in seizure 
+	counter = 0
+	for i in xrange(dataset.no_seizure):
+		print "seizure i", i,
+		sys.stdout.flush()
+		filename = dataset.base_name + str(i*6+1) + '_1.mat'
+		if filename in legal_seizure_files[dataset.user]:
+			data_1h = read_data_1h(path,'_1.mat',i*6+1)
+			ch_arrays = []
+			for ch in channels:
+				ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
+			magnitude = np.stack(ch_arrays, axis=0)
+			g.ms_seizure[counter_seizure] = magnitude
+			counter_seizure += 1
+			counter += 1
+		if counter >= no_seizure:
+			break;
+	
+	print "Done reading in", no_normal, "no seizure hours and", no_seizure, "seizure hours"
+
+# extra code for Kaggle's fuckup
+def read_extra_dataset(dataset):
+	global extra_counter
+
+	print "read data and preprocess (fft and slicing)"
+	channels = chs[dataset.user]
 	print "read in channels", channels
 	
 	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
 	print path
 
 	# read in normal 
-	is_train_index = get_train_val_split(k_normal_train,k_normal_val)
-	no_normal = k_normal_val + k_normal_train
-	for i in xrange(no_normal):
-		print "normal i", i
+	for i in dataset.file_indices_whitelist():
+		print "xtra ", dataset.user, i
 		sys.stdout.flush()
-		data_1h = read_data_1h(path,'_0.mat',i*6+1)
+		data = read_data(path,'.mat',i+1)
 		ch_arrays = []
 		for ch in channels:
-			ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
+			ch_arrays.append(calcFFT(data[:,ch],fft_width,overlap)[:,floor:ceil])
 		magnitude = np.stack(ch_arrays, axis=0)
-		if is_train_index[i]:
-			g.magnitudes_normal_train[train_counter_normal] = magnitude
-			train_counter_normal += 1
-		else:
-			g.magnitudes_normal_val[val_counter_normal] = magnitude
-			val_counter_normal += 1
+		g.ms_xtra_seizure[extra_counter] = magnitude
+		extra_counter += 1
 
-	# read in seizure 
-	is_train_index = get_train_val_split(k_seizure_train,k_seizure_val)
-	no_seizure = k_seizure_val + k_seizure_train
-	for i in xrange(no_seizure):
-		print "seizure i", i
-		sys.stdout.flush()
-		data_1h = read_data_1h(path,'_1.mat',i*6+1)
-		ch_arrays = []
-		for ch in channels:
-			ch_arrays.append(calcFFT(data_1h[:,ch],fft_width,overlap)[:,floor:ceil])
-		magnitude = np.stack(ch_arrays, axis=0)
-		if is_train_index[i]:
-			g.magnitudes_seizure_train[train_counter_seizure] = magnitude
-			train_counter_seizure += 1
-		else:
-			g.magnitudes_seizure_val[val_counter_seizure] = magnitude
-			val_counter_seizure += 1
+	print "Done reading in", len(dataset.file_indices_whitelist()), "test snippets of 10min."
+
+def set_white_lists():
 	
-	print "Done reading in", no_normal, "no seizure hours and", no_seizure, "seizure hours"
+	with open('./'+args.new_data) as f:
+		print f.readline() # read the headers
+		for line in f:
+		 	words = line.rsplit()[0].split(',')
+		 	#only keep the safe files
+			if words[2] == '1':
+				if words[1] == '1':
+					patient = 'patient'+words[0].split('_')[0]
+					for ds in datasets.new_datasets:
+						if ds.user == patient:
+							ds.whitelist.append(int(words[0].split('_')[1].split('.')[0]))
+				else:
+					print 'Warning: CSV file should only contain seizure files.'
+					print words
+			else:
+				print 'Warning: CSV file should only contain safe files.'
+				print words
+
+
+def allocate_array():
+	global extra_counter
+
+	n_samples = 0
+
+	extra_counter = 0
+	for dataset in datasets.new_datasets:
+		if dataset.user in chs.keys():
+			n_samples += len(dataset.file_indices_whitelist())
+
+	test = read_data(data_path+'/test_1/1_','.mat',1)
+	test_magnitude = calcFFT(test[:,0],fft_width,overlap)[:,floor:ceil]
+	stft_steps = test_magnitude.shape[0]
+
+	g.ms_xtra_seizure = np.zeros((n_samples,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+
+def read_extra_data():
+
+	set_white_lists()
+	allocate_array()
+
+
+	for dataset in datasets.new_datasets:
+		if dataset.user in chs.keys():
+			print dataset.user, 'in', chs.keys()
+			read_extra_dataset(dataset)
+
 
 def read_test_data(dataset,start,stop):
-	global magnitudes_test
+	global ms_test
 	global test_counter
 
 	print "read data and preprocess (fft and slicing)"
-	channels = patients[dataset.user]
+	channels = chs[dataset.user]
 	print "read in channels", channels
 	
 	path = data_path+'/'+dataset.set_name+'/'+dataset.base_name
@@ -216,212 +341,178 @@ def read_test_data(dataset,start,stop):
 		for ch in channels:
 			ch_arrays.append(calcFFT(data[:,ch],fft_width,overlap)[:,floor:ceil])
 		magnitude = np.stack(ch_arrays, axis=0)
-		magnitudes_test[test_counter] = magnitude
+		ms_test[test_counter] = magnitude
 		test_counter += 1
-
 
 	print "Done reading in", stop-start, "test snippets of 10min."
 
-def get_train_val_split(train_no,val_no):
+def get_train_val_split(train_no,val_no,fold=1):
 	no = train_no + val_no
-	if args.fixed_seed:
-		random.seed(0) 
-		np.random.seed(0)
-	all_indices = np.arange(no)
-	if args.shuffle_before_split:
-		np.random.shuffle(all_indices)
-	train_file_indices = all_indices[:train_no]
 	is_train_index = np.zeros(no, dtype=np.bool)
-	is_train_index[train_file_indices] = True
+	is_train_index[:train_no] = True
 	# val_no = no - train_no
 	# val_indices = all_indices[train_no:]
 	return is_train_index
 
+def normalize():
+	global maximum
+	global minimum
+
+	print "percentiles:"
+	for p in range(0,101,10):
+		print p, np.percentile(g.ms_normal, p), np.percentile(g.ms_seizure, p)
+
+	max1 = np.amax(g.ms_seizure)
+	max2 = np.amax(g.ms_normal)
+	max3 = np.amax(g.ms_xtra_seizure)
+	maximum = max([max1,max2,max3])
+
+	min1 = np.amin(g.ms_seizure)
+	min2 = np.amin(g.ms_normal)
+	min3 = np.amin(g.ms_xtra_seizure)
+	minimum = max([min1,min2,min3])
+
+	if cfg['preprocess']['normalization'] == 'div_max_x255':
+		print "Normalizing/maximum*255 ", maximum
+		g.ms_seizure = g.ms_seizure/maximum*255.0
+		g.ms_normal = g.ms_normal/maximum*255.0
+		g.ms_xtra_seizure = g.ms_xtra_seizure/maximum*255.0
+
+
+	if cfg['preprocess']['normalization'] == 'min_max_x255':
+		print "Normalizing-minimum)/(maximum-minimum)*255 ", maximum, minimum
+		g.ms_seizure = (g.ms_seizure-minimum)/(maximum-minimum)*255.0
+		g.ms_normal = (g.ms_normal-minimum)/(maximum-minimum)*255.0
+		g.ms_xtra_seizure = (g.ms_xtra_seizure-minimum)/(maximum-minimum)*255.0
+
+	if cfg['preprocess']['normalization'] == 'log':
+		print "Normalizing  log(1+x)*100 "
+		xTrain = np.log10(1+xTrain)*100
+		xVal = np.log10(1+xVal)*100
+
+	# maximum = model_norm['normalization_data']['maximum']
+	# print "Normalizing  log(x)/maximum*2-1 ", maximum
+	# xTrain = np.log(xTrain)
+	# xVal = np.log(xVal)
+	# xTrain = xTrain/maximum*2.0-1.0
+	# xVal = xVal/maximum*2.0-1.0
+
+	# mean = model_norm['normalization_data']['mean']
+	# stdev = model_norm['normalization_data']['stdev']
+	# print "Normalizing with mean ", mean, " stdev ", stdev
+	# xTrain = np.log(xTrain)
+	# xVal = np.log(xVal)
+	# xTrain = (xTrain-mean)/stdev
+	# xVal = (xVal-mean)/stdev
+
 def preprocess():
 	global size
-	global xTrain
-	global udTrain
-	global yTrain
-	global aTrain
-	global xVal
-	global udVal
-	global yVal
-	global aVal
-	global train_counter_seizure
-	global val_counter_seizure
-	global train_counter_normal
-	global val_counter_normal
-	global userdata
-	global labels
-	global analysis_datas
+	global x
+	global counter_seizure
+	global counter_normal
 
 	print("Loading and preprocessing data...")
 
-	no_normal_train = 0
-	no_normal_val = 0
-	no_seizure_train = 0
-	no_seizure_val = 0
+
+	read_extra_data()
+
+	no_normal = 0
+	no_seizure = 0
 
 	for dataset in datasets.all:
-		if dataset.enabled:
-			no_normal_val += int(dataset.no_normal * args.debug_sub_ratio * args.chosen_validation_ratio)
-			no_normal_train += int(dataset.no_normal * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
-			no_seizure_val += int(dataset.no_seizure * args.debug_sub_ratio * args.chosen_validation_ratio)
-			no_seizure_train += int(dataset.no_seizure * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
+		if dataset.enabled and dataset.trainset:
+			no_normal += int(dataset.no_normal_clean * args.debug_sub_ratio)
+			no_seizure += int(dataset.no_seizure_clean * args.debug_sub_ratio)
 	
 
-	no_normal = no_normal_val + no_normal_train
-	no_seizure = no_seizure_val + no_seizure_train
-
-	print "total"
-	print no_normal
-	print no_seizure
-	print "train"
-	print no_normal_train
-	print no_seizure_train
-	print "validation"
-	print no_normal_val
-	print no_seizure_val
+	print 'total', 'no_normal', no_normal, 'no_seizure', no_seizure
 	
 	test = read_data_1h(data_path+'/train_1/1_','_0.mat',1)
 	test_magnitude = calcFFT(test[:,0],fft_width,overlap)[:,floor:ceil]
 	print "test_magnitude.shape", test_magnitude.shape
 	stft_steps = test_magnitude.shape[0]
 
+	print no_seizure
+	print no_normal
 
-	print no_seizure_train
-	print no_seizure-no_seizure_train
-	print no_normal_train
-	print no_normal-no_normal_train
-
-	g.magnitudes_seizure_train = np.zeros((no_seizure_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	g.magnitudes_seizure_val = np.zeros((no_seizure_val,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	g.magnitudes_normal_train = np.zeros((no_normal_train,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	g.magnitudes_normal_val = np.zeros((no_normal_val,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	g.ms_seizure = np.zeros((no_seizure,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	g.ms_normal = np.zeros((no_normal,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
 	
-
-	# analysis_datas = np.zeros(size, dtype=analysis_data_type)
-
-	global train_counter_seizure
-	global val_counter_seizure
-	train_counter_seizure = 0
-	val_counter_seizure = 0
-
-	global train_counter_normal
-	global val_counter_normal
-	train_counter_normal = 0
-	val_counter_normal = 0
+	counter_seizure = 0
+	counter_normal = 0
 
 	no_dss = 0
 	for dataset in datasets.all:
-		if dataset.enabled:
+		if dataset.enabled and dataset.trainset:
 			no_dss += 1
 
 	for dataset in datasets.all:
 		if dataset.enabled and dataset.trainset:
 			print "Read in dataset from %s ..."%(dataset.set_name)
 			print "Processing data ..."
-			k_normal_val = int(dataset.no_normal * args.debug_sub_ratio * args.chosen_validation_ratio)
-			k_normal_train = int(dataset.no_normal * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
-			k_seizure_val = int(dataset.no_seizure * args.debug_sub_ratio * args.chosen_validation_ratio)
-			k_seizure_train = int(dataset.no_seizure * args.debug_sub_ratio * (1-args.chosen_validation_ratio))
-			read_train_data(dataset,k_normal_val,k_normal_train,k_seizure_val,k_seizure_train)
-			print 'train_counter_seizure', train_counter_seizure, 'val_counter_seizure', val_counter_seizure
-			print 'train_counter_normal', train_counter_normal, 'val_counter_normal', val_counter_normal
+			k_normal = int(dataset.no_normal_clean * args.debug_sub_ratio)
+			k_seizure = int(dataset.no_seizure_clean * args.debug_sub_ratio)
+			read_train_data(dataset,k_normal,k_seizure)
 
 	process = psutil.Process(os.getpid())
 	print("Memory usage (GB): "+str(process.memory_info().rss/1e9))
 
-	print 'train_counter_seizure', train_counter_seizure, 'val_counter_seizure', val_counter_seizure
-	print 'train_counter_normal', train_counter_normal, 'val_counter_normal', val_counter_normal
+	normalize()
 
-	print "percentiles:"
-	for p in range(0,101,10):
-		print p, np.percentile(g.magnitudes_normal_train, p), np.percentile(g.magnitudes_normal_val, p)
-
-	#Construct training vector
-	train_multiplier = 1
-	gcd_ = gcd(no_normal,no_seizure)
-	samplesph_normal = train_multiplier * no_seizure / gcd_
-	samplesph_seizure = train_multiplier * no_normal / gcd_
-	size_train = no_normal_train * samplesph_normal + no_seizure_train * samplesph_seizure
-	
-	magnitudes = np.hstack((np.arange(size_train/2),np.arange(size_train/2)))
-	labels = np.hstack((np.zeros(size_train/2),np.ones(size_train/2)))
-	np.random.shuffle(labels)
-
-	yTrain = labels.astype(np.int32)
-	xTrain = magnitudes.astype(np.float32)
-
-	print("Histogram:")
-	print np.bincount(yTrain)
-
-	print "yTrain.shape", yTrain.shape
-	print "xTrain.shape", xTrain.shape
-
-	#Construct validation vector
-	val_mult = 3
-	gcd_ = gcd(no_normal_val,no_seizure_val)
-	samplesph_normal = val_mult * no_seizure_val / gcd_
-	samplesph_seizure = val_mult * no_normal_val / gcd_
-	size_val = no_normal_val * samplesph_normal + no_seizure_val * samplesph_seizure
-	
-	magnitudes = np.hstack((np.arange(size_val/2)%no_normal_val,np.arange(size_val/2)%no_seizure_val))
-	labels = np.hstack((np.zeros(size_val/2),np.ones(size_val/2)))	
-
-	yVal = labels.astype(np.int32)
-	xVal = magnitudes.astype(np.float32)
-
-	print("Histogram:")
-	print np.bincount(yVal)
-
-	print "yTrain.shape", yTrain.shape
-	print "xTrain.shape", xVal.shape
-
-	print "xVal.shape", xVal.shape
-	print "yVal.shape", yVal.shape
-	xVal = np.vstack((xVal,yVal))
-	xVal = np.swapaxes(xVal,0,1)
-
-	size = size_val +size_train
-	no_val = int(math.floor(args.chosen_validation_ratio * size))
-	no_train = size-no_val
-	assert no_train + no_val == size
-	print 'Ratio validation:', no_val/float(size)
-	if abs(no_val/float(size) - args.chosen_validation_ratio) > 0.02:
-		print "WARNING: validation ratio (%g) differs from expected value (%g)"%(no_val/float(size), args.chosen_validation_ratio)
-	
-
-	del magnitudes
-	gc.collect()
-
-
-	print 'xTrain.shape', xTrain.shape
-	print 'yTrain.shape', yTrain.shape
-	print 'xVal.shape', xVal.shape
-	print 'yVal.shape', yVal.shape
-	assert xTrain.shape[0] == yTrain.shape[0]
-	assert xVal.shape[0] == yVal.shape[0]
+	#Construct data vector
+	x = dict()
+	x['normal'] = range(len(g.ms_normal))
+	x['seizure'] = range(len(g.ms_seizure))
+	x['xtra_seizure'] = range(len(g.ms_xtra_seizure))
 
 	if args.save_preprocessed:
 		print("Saving preprocessed data...")
 		data = {
-			'magnitudes_seizure_val': g.magnitudes_seizure_val,
-			'magnitudes_seizure_train': g.magnitudes_seizure_train,
-			'magnitudes_normal_val': g.magnitudes_normal_val,
-			'magnitudes_normal_train': g.magnitudes_normal_train,
-			'xTrain':xTrain, 
-			#'udTrain':udTrain, 
-			#'aTrain':aTrain, 
-			'yTrain':yTrain, 
-			'xVal':xVal,
-			#'udVal':udVal, 
-			'yVal':yVal,
+			'ms_seizure': g.ms_seizure,
+			'ms_normal': g.ms_normal,
+			'ms_xtra_seizure': g.ms_xtra_seizure,
+			'minimum': minimum,
+			'maximum': maximum,
 			}
 		hkl.dump(data, 'preprocessedData.hkl',compression="lzf")
 
+
+
+def apply_normalization(data_in):
+	global maximum
+	global minimum
+
+	if cfg['preprocess']['normalization'] == 'div_max_x255':
+		print "Normalizing/maximum*255 ", maximum
+		data_out = data_in/maximum*255.0
+
+	if cfg['preprocess']['normalization'] == 'min_max_x255':
+		print "Normalizing-minimum)/(maximum-minimum)*255 ", maximum, minimum
+		data_out = (data_in-minimum)/(maximum-minimum)*255.0
+
+	if cfg['preprocess']['normalization'] == 'log':
+		print "Normalizing  log(1+x)*100 "
+		data_out = np.log10(1+data_in)*100
+
+	# maximum = model_norm['normalization_data']['maximum']
+	# print "Normalizing  log(x)/maximum*2-1 ", maximum
+	# xTrain = np.log(xTrain)
+	# xVal = np.log(xVal)
+	# xTrain = xTrain/maximum*2.0-1.0
+	# xVal = xVal/maximum*2.0-1.0
+
+	# mean = model_norm['normalization_data']['mean']
+	# stdev = model_norm['normalization_data']['stdev']
+	# print "Normalizing with mean ", mean, " stdev ", stdev
+	# xTrain = np.log(xTrain)
+	# xVal = np.log(xVal)
+	# xTrain = (xTrain-mean)/stdev
+	# xVal = (xVal-mean)/stdev
+
+	return data_out
+
 def preprocess_test_data():
-	global magnitudes_test
+	global ms_test
 	global test_counter
 
 	print("Loading and preprocessing data...")
@@ -439,8 +530,8 @@ def preprocess_test_data():
 	print "test_magnitude.shape", test_magnitude.shape
 	stft_steps = test_magnitude.shape[0]
 
-	magnitudes_test = np.zeros((no_files,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
-	print magnitudes_test.shape
+	ms_test = np.zeros((no_files,args.no_channels,stft_steps,ceil-floor), dtype=np.float32)
+	print ms_test.shape
 	test_counter = 0
 
 
@@ -450,61 +541,47 @@ def preprocess_test_data():
 			nf = int(dataset.no_files * args.debug_sub_ratio)
 			read_test_data(dataset,0,nf)
 
+	ms_test = apply_normalization(ms_test)
+
 	process = psutil.Process(os.getpid())
 	print("Memory usage (GB): "+str(process.memory_info().rss/1e9))
 
-
-
 def load_preprocessed():
+	global minimum
+	global maximum
+
 	#global include_userdata
-	global xTrain
-	global yTrain
-	#global aTrain
-	global xVal
-	global yVal
-	#global aVal
-	global udTrain
-	global udVal
 	print("Loading preprocessed data....")
 	data = hkl.load('preprocessedData.hkl')
-	xTrain = data['xTrain']
-	yTrain = data['yTrain']
-	#aTrain = data['aTrain']
-	xVal = data['xVal']
-	yVal = data['yVal']
-	g.magnitudes_seizure_val = data['magnitudes_seizure_val']
-	g.magnitudes_seizure_train = data['magnitudes_seizure_train']
-	g.magnitudes_normal_val = data['magnitudes_normal_val']
-	g.magnitudes_normal_train = data['magnitudes_normal_train']
-	#aVal = data['aVal']
-	# if include_userdata:
-	# 	udTrain = data['udTrain']
-	# 	udVal = data['udVal']	
+	g.ms_normal = data['ms_normal']
+	g.ms_seizure = data['ms_seizure']
+	g.ms_seizure = data['ms_xtra_seizure']
+	minimum = data['minimum']
+	maximum = data['maximum']
 
 #@profile
 def train(netSpec):
-	global xTrain
-	global xVal
-	global yTrain
-	global yVal
-
-
-	xTrain = xTrain.astype(np.float32)
-	xVal = xVal.astype(np.float32)
-
-	yTrain = yTrain.astype(np.int32)
-	yVal = yVal.astype(np.int32)
+	global x
+	global maximum
+	global minimum
 
 	print("Training model...")
-	netSpec.fit(xTrain, yTrain)
+	#Only for passing nolearn's check
+	y = {'normal': np.zeros(len(x['normal'])),
+		'seizure': np.zeros(len(x['seizure'])),
+		'xtra_seizure': np.zeros(len(x['xtra_seizure'])),}
+
+	# The brackets are a hack to avoid nolearn's check 
+	netSpec.fit([x], [y]) 
 
 	if not args.no_save_model:
 		patient_str = '-'.join(args.patients)
 		model_filename = patient_str+'_'+cfg['training']['model']+'_'+datetime.now().strftime("%m-%d-%H-%M-%S")+'.pickle'
 		print("Saving model...")
-		model = {'model':netSpec.get_all_params_values()}
+		model = {'model':netSpec.get_all_params_values(), 'minimum':minimum, 'maximum':maximum}
 		with open(args.model_path+'/'+model_filename, 'w') as f:
 			pickle.dump(model, f)
+
 	return netSpec 
 
 def load_trained_and_normalize(netSpec, xTrain, xVal):
@@ -568,67 +645,78 @@ def load_trained_and_normalize(netSpec, xTrain, xVal):
 	return netSpec, xTrain, xVal
 
 def predict(netSpec, xVal):
-	if args.mode=="single-channel":
-		pp0 = netSpec.predict_proba(xVal[:,[0]])
-		pp1 = netSpec.predict_proba(xVal[:,[1]])
-		pp2 = netSpec.predict_proba(xVal[:,[2]])
-		pp3 = netSpec.predict_proba(xVal[:,[3]])
-		pp = (pp0+pp1+pp2+pp3)/args.no_channels
-		return np.argmax(pp,axis=1)
-	elif args.shift==3 and args.no_training:
-		pp0 = netSpec.predict_proba(xVal[:,:,2:])
-		pp1 = netSpec.predict_proba(xVal[:,:,1:-1])
-		pp2 = netSpec.predict_proba(xVal[:,:,0:-2])
-		pp = (pp0+pp1+pp2)/4
-		return np.argmax(pp,axis=1)
-	elif args.shift==5 and args.no_training:
-		pp0 = netSpec.predict_proba(xVal[:,:,4:])
-		pp1 = netSpec.predict_proba(xVal[:,:,3:-1])
-		pp2 = netSpec.predict_proba(xVal[:,:,2:-2])
-		pp3 = netSpec.predict_proba(xVal[:,:,1:-3])
-		pp4 = netSpec.predict_proba(xVal[:,:,0:-4])
-		pp = (pp0+pp1+pp2+pp3+pp4)/4
-		return np.argmax(pp,axis=1)
-	else:
-		return netSpec.predict(xVal)
+	return netSpec.predict(xVal)
+
+
+def check_magnitudes():
+	check(g.ms_seizure)
+	check(g.ms_normal)
+
+def check(m_array):
+	for m in m_array:
+		if np.sum(m)<0.1:
+			print 'Warning: found a zero or near zero sum array'
+
 
 def test():
-
 	print("Validating...")
 	print "Changing batch iterator test:"
 	from nolearn.lasagne import BatchIterator
 	netSpec.batch_iterator_test = BatchIterator(batch_size=128)
 
+	train_split = TrainSplit(5,0)
+	x_train, x_valid, dummy_0, dummy_1 = train_split([x],None)
+
 	print "Calculating final prediction for the hour long sessions"
-	print "magnitudes_normal_val.shape", g.magnitudes_normal_val.shape
-	probabilities_hour = []
+	print "ms_normal.shape", g.ms_normal.shape
+	probabilities_normal_hour = []
 	probabilities_normal = []
-	for mag_hour in g.magnitudes_normal_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+	for hour in x_valid['normal']:
+		mag_hour = g.ms_normal[hour]
+		patches = rolling_window_ext(mag_hour,(m_window,ceil-floor))
 		patches = np.swapaxes(patches,0,2)
 		predictions_patches = netSpec.predict_proba(patches[0])
 		probabilities_normal.append(predictions_patches)
 		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-		probabilities_hour.append(prediction_hour[1])
+		probabilities_normal_hour.append(prediction_hour[1])
 
+	probabilities_seizure_hour = []
 	probabilities_seizure = []
-	print "magnitudes_seizure_val.shape", g.magnitudes_seizure_val.shape
-	for mag_hour in g.magnitudes_seizure_val:
-		patches = rolling_window_ext(mag_hour,(magnitude_window,ceil-floor))
+	print "ms_seizure.shape", g.ms_seizure.shape
+	for hour in x_valid['seizure']:
+		mag_hour = g.ms_seizure[hour]
+		patches = rolling_window_ext(mag_hour,(m_window,ceil-floor))
 		patches = np.swapaxes(patches,0,2)
 		predictions_patches = netSpec.predict_proba(patches[0])
 		probabilities_seizure.append(predictions_patches)
 		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
-		probabilities_hour.append(prediction_hour[1])
+		probabilities_seizure_hour.append(prediction_hour[1])
+
+	probabilities_xtra_seizure_hour = []
+	probabilities_xtra_seizure = []
+	print "ms_xtra_seizure.shape", g.ms_xtra_seizure.shape
+	for hour in x_valid['xtra_seizure']:
+		mag_hour = g.ms_xtra_seizure[hour]
+		patches = rolling_window_ext(mag_hour,(m_window,ceil-floor))
+		patches = np.swapaxes(patches,0,2)
+		predictions_patches = netSpec.predict_proba(patches[0])
+		probabilities_xtra_seizure.append(predictions_patches)
+		prediction_hour = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
+		probabilities_xtra_seizure_hour.append(prediction_hour[1])
 
 	probabilities_normal = np.stack(probabilities_normal)
+	for p in probabilities_seizure:
+		print p.shape
 	probabilities_seizure = np.stack(probabilities_seizure)
+	probabilities_xtra_seizure = np.stack(probabilities_xtra_seizure)
 	probabilities_normal = np.reshape(probabilities_normal,(-1,2))
-	probabilities_seizure = np.reshape(probabilities_seizure,(-1,2))	
+	probabilities_seizure = np.reshape(probabilities_seizure,(-1,2))
+	probabilities_xtra_seizure = np.reshape(probabilities_xtra_seizure,(-1,2))	
 	print "probabilities_normal", probabilities_normal.shape
 	print "probabilities_seizure", probabilities_seizure.shape	
-	yVal = np.hstack((np.zeros(len(probabilities_normal)),np.ones(len(probabilities_seizure))))
-	probabilities = np.vstack((probabilities_normal,probabilities_seizure))
+	print "probabilities_xtra_seizure", probabilities_xtra_seizure.shape
+	yVal = np.hstack((np.zeros(len(probabilities_normal)),np.ones(len(probabilities_seizure)),np.ones(len(probabilities_xtra_seizure))))
+	probabilities = np.vstack((probabilities_normal,probabilities_seizure,probabilities_xtra_seizure))
 	prediction = np.argmax(probabilities,axis=1)
 	print("Showing last 30 test samples..")
 	print("Predictions:")
@@ -650,7 +738,25 @@ def test():
 	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
 	print "log_loss:", log_loss(yVal, probabilities[:,1])
 
-	yVal_hour = np.hstack((np.zeros(g.magnitudes_normal_val.shape[0]),np.ones(g.magnitudes_seizure_val.shape[0])))
+	print len(probabilities_normal_hour)
+	print len(probabilities_seizure_hour)
+	print len(probabilities_xtra_seizure_hour)
+
+	print 'probabilities_normal_hour'
+	for p in probabilities_normal_hour:
+		print p
+
+	print 'probabilities_seizure_hour'
+	for p in probabilities_seizure_hour:
+		print p
+
+	print 'probabilities_xtra_seizure_hour'
+	for p in probabilities_xtra_seizure_hour:
+		print p
+
+
+	yVal_hour = np.hstack((np.zeros(len(probabilities_normal_hour)),np.ones(len(probabilities_seizure_hour)),np.ones(len(probabilities_xtra_seizure_hour))))
+	probabilities_hour = probabilities_normal_hour + probabilities_seizure_hour + probabilities_xtra_seizure_hour		
 	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
 	print "log_loss for the hours:", log_loss(yVal_hour, probabilities_hour)
 
@@ -673,8 +779,8 @@ def test():
 		preprocess_test_data()
 
 		probabilities_test = []
-		for mag_test in magnitudes_test:
-			patches = rolling_window_ext(mag_test,(magnitude_window,ceil-floor))
+		for mag_test in ms_test:
+			patches = rolling_window_ext(mag_test,(m_window,ceil-floor))
 			patches = np.swapaxes(patches,0,2)
 			predictions_patches = netSpec.predict_proba(patches[0])
 			prediction_test = np.sum(predictions_patches,axis=0)/predictions_patches.shape[0]
@@ -706,8 +812,11 @@ if args.no_preprocessing:
 else:
 	preprocess()
 
+check_magnitudes()
+
 model_training = None
 model_evaluation = None
+
 print "Building models ..."
 if include_userdata:
 	import convnets.multi_user_models as cnmu
@@ -727,16 +836,19 @@ if args.mode=="single-channel":
 else:
 	no_channels = args.no_channels
 
-import batch_iterators
-if args.no_training:
-	netSpec = model_evaluation(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_bal_complete(16),batch_iterator_test=batch_iterators.BI_test_bal_complete(16))
-else:
-	netSpec = model_training(no_channels,magnitude_window,ceil-floor,batch_iterator_train=batch_iterators.BI_train_bal_complete(16),batch_iterator_test=batch_iterators.BI_test_bal_complete(16))	
+from batch_iterators import BI_new
+from train_split import TrainSplit
 
 if args.no_training:
+	netSpec = model_evaluation(no_channels,m_window,ceil-floor,
+		train_split = TrainSplit(5,0),
+		batch_iterator_train=BI_new(16),batch_iterator_test=BI_new(128))
 	netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)
 else:
-	netSpec = train(netSpec)
+	netSpec = model_training(no_channels,m_window,ceil-floor,
+		train_split = TrainSplit(5,0),
+		batch_iterator_train=BI_new(16),batch_iterator_test=BI_new(128))
+	netSpec = train(netSpec)	
 
 if args.chosen_validation_ratio != 0:
 	test()
