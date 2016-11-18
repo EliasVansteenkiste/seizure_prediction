@@ -13,6 +13,7 @@ from matplotlib import gridspec
 
 from tools.utils import calcFFT, rolling_window_ext
 from tools.analyze import read_data_1h, read_data
+from train_split import TrainSplit
 from fractions import gcd
 
 import numpy as np
@@ -27,6 +28,7 @@ import gc
 #from memory_profiler import profile
 import psutil
 import scipy
+import operator
 
 from sklearn.base import clone
 from datetime import datetime
@@ -292,7 +294,6 @@ def set_white_lists():
 				print 'Warning: CSV file should only contain safe files.'
 				print words
 
-
 def allocate_array():
 	global extra_counter
 
@@ -319,7 +320,6 @@ def read_extra_data():
 		if dataset.user in chs.keys():
 			print dataset.user, 'in', chs.keys()
 			read_extra_dataset(dataset)
-
 
 def read_test_data(dataset,start,stop):
 	global ms_test
@@ -475,8 +475,6 @@ def preprocess():
 			'maximum': maximum,
 			}
 		hkl.dump(data, 'preprocessedData.hkl',compression="lzf")
-
-
 
 def apply_normalization(data_in):
 	global maximum
@@ -657,14 +655,13 @@ def check(m_array):
 		if np.sum(m)<0.1:
 			print 'Warning: found a zero or near zero sum array'
 
-
-def test():
+def test(netSpec, fold, no_folds):
 	print("Validating...")
 	print "Changing batch iterator test:"
 	from nolearn.lasagne import BatchIterator
 	netSpec.batch_iterator_test = BatchIterator(batch_size=128)
 
-	train_split = TrainSplit(5,0)
+	train_split = TrainSplit(no_folds,fold)
 	x_train, x_valid, dummy_0, dummy_1 = train_split([x],None)
 
 	print "Calculating final prediction for the hour long sessions"
@@ -735,29 +732,15 @@ def test():
 	from sklearn.metrics import roc_auc_score,log_loss
 	print probabilities[:,1].shape
 	print yVal.shape
-	print "roc_auc:", roc_auc_score(yVal, probabilities[:,1])
+	roc_auc = roc_auc_score(yVal, probabilities[:,1])
+	print "roc_auc:", roc_auc
 	print "log_loss:", log_loss(yVal, probabilities[:,1])
-
-	print len(probabilities_normal_hour)
-	print len(probabilities_seizure_hour)
-	print len(probabilities_xtra_seizure_hour)
-
-	print 'probabilities_normal_hour'
-	for p in probabilities_normal_hour:
-		print p
-
-	print 'probabilities_seizure_hour'
-	for p in probabilities_seizure_hour:
-		print p
-
-	print 'probabilities_xtra_seizure_hour'
-	for p in probabilities_xtra_seizure_hour:
-		print p
 
 
 	yVal_hour = np.hstack((np.zeros(len(probabilities_normal_hour)),np.ones(len(probabilities_seizure_hour)),np.ones(len(probabilities_xtra_seizure_hour))))
 	probabilities_hour = probabilities_normal_hour + probabilities_seizure_hour + probabilities_xtra_seizure_hour		
-	print "roc_auc for the hours:", roc_auc_score(yVal_hour, probabilities_hour)
+	roc_auc_hours = roc_auc_score(yVal_hour, probabilities_hour)
+	print "roc_auc for the hours:", roc_auc_hours
 	print "log_loss for the hours:", log_loss(yVal_hour, probabilities_hour)
 
 	print "saving predictions to csv file" 
@@ -798,13 +781,11 @@ def test():
 					csv.write(filename+','+str(probabilities_test[counter+i])+'\n')
 		csv.close
 
-
+	return roc_auc, roc_auc_hours
 
 data_path = args.data_path
 
 files_per_hour = 6
-
-#is_train_index = get_train_val_split(size)
 
 
 if args.no_preprocessing:
@@ -814,41 +795,57 @@ else:
 
 check_magnitudes()
 
-model_training = None
-model_evaluation = None
+def train_and_test(fold=0,no_folds=5):
+	model_training = None
+	model_evaluation = None
 
-print "Building models ..."
-if include_userdata:
-	import convnets.multi_user_models as cnmu
-	model_training = getattr(cnmu, cfg['training']['model'])
-	print "Model name for the training phase: ", cfg['training']['model']
-	model_evaluation = getattr(cnmu, cfg['evaluation']['model'])
-	print "Model name for the evaluation phase: ", cfg['evaluation']['model']
-else:
-	import convnets.models as cn
-	model_training = getattr(cn, cfg['training']['model'])
-	print "Model name for the training phase: ", cfg['training']['model']
-	model_evaluation = getattr(cn, cfg['evaluation']['model'])
-	print "Model name for the evaluation phase: ", cfg['evaluation']['model']
+	print "Building models ..."
+	if include_userdata:
+		import convnets.multi_user_models as cnmu
+		model_training = getattr(cnmu, cfg['training']['model'])
+		print "Model name for the training phase: ", cfg['training']['model']
+		model_evaluation = getattr(cnmu, cfg['evaluation']['model'])
+		print "Model name for the evaluation phase: ", cfg['evaluation']['model']
+	else:
+		import convnets.models as cn
+		model_training = getattr(cn, cfg['training']['model'])
+		print "Model name for the training phase: ", cfg['training']['model']
+		model_evaluation = getattr(cn, cfg['evaluation']['model'])
+		print "Model name for the evaluation phase: ", cfg['evaluation']['model']
 
-if args.mode=="single-channel":
-	no_channels = 1
-else:
-	no_channels = args.no_channels
+	if args.mode=="single-channel":
+		no_channels = 1
+	else:
+		no_channels = args.no_channels
 
-from batch_iterators import BI_new
-from train_split import TrainSplit
+	from batch_iterators import BI_new
 
-if args.no_training:
-	netSpec = model_evaluation(no_channels,m_window,ceil-floor,
-		train_split = TrainSplit(5,0),
-		batch_iterator_train=BI_new(16),batch_iterator_test=BI_new(128))
-	netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)
-else:
-	netSpec = model_training(no_channels,m_window,ceil-floor,
-		train_split = TrainSplit(5,0),
-		batch_iterator_train=BI_new(16),batch_iterator_test=BI_new(128))
-	netSpec = train(netSpec)	
+	if args.no_training:
+		netSpec = model_evaluation(no_channels,m_window,ceil-floor,
+			train_split = TrainSplit(no_folds,fold),
+			batch_iterator_train=BI_new(16),batch_iterator_test=BI_new(128))
+		netSpec, xTrain, xVal = load_trained_and_normalize(netSpec, xTrain, xVal)
+	else:
+		netSpec = model_training(no_channels,m_window,ceil-floor,
+			train_split = TrainSplit(no_folds,fold),
+			batch_iterator_train=BI_new(16),batch_iterator_test=BI_new(128))
+		netSpec = train(netSpec)	
 
-if args.chosen_validation_ratio != 0:
-	test()
+	if args.chosen_validation_ratio != 0:
+		return test(netSpec, fold, no_folds)
+
+def geometric_mean(iterable):
+    return (reduce(operator.mul, iterable)) ** (1.0/len(iterable))
+
+no_folds = 5
+roc_auc_lst = []
+roc_auc_hours_lst = []
+for i in range(no_folds):
+	roc_auc, roc_auc_hours = train_and_test(i,no_folds)
+	roc_auc_lst.append(roc_auc)
+	roc_auc_hours_lst.append(roc_auc_hours)
+
+print 'geomean_roc_auc: ', geometric_mean(roc_auc_lst)
+print 'geomean_roc_auc_hours: ', geometric_mean(roc_auc_hours_lst)
+
+

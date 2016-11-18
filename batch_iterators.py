@@ -177,7 +177,6 @@ class BI_new(BatchIterator):
 			self.y = y 
 		else:
 			self.y = y[0]
-		print X
 		self.X = X
 		return self
 
