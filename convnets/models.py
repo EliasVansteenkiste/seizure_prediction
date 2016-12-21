@@ -2343,3 +2343,39 @@ def net57(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_le
         train_split = train_split,
     )
     return net
+
+def net58(n_channels,width,height,n_output=2,nonlinearity=nonlinearities.very_leaky_rectify,
+    train_split=TrainSplit(0.2),
+    batch_iterator_train=BatchIterator(batch_size=256),batch_iterator_test=BatchIterator(batch_size=256)):   
+    #from net29  seperate input layers for each channel
+    layer = InputLayer(shape=(None, n_channels, width, height))
+    # channel reduction == feature map reduction
+    layer = Conv2DLayer(layer, nonlinearity=None, filter_size=(1,1), num_filters=4)
+
+    # reduction in freq components #reshape to a 2D image with only one channel
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(1,height), stride=(1,1), num_filters=32)
+    layer = ReshapeLayer(layer, ([0], 1, [2], -1))
+    layer = dropout(layer,p=0.5)
+
+    layer = Conv2DLayer(layer, nonlinearity=nonlinearity, W=he_norm, filter_size=(1,32), stride=(1,1), num_filters=64)
+    layer = ReshapeLayer(layer, ([0], 1, [2], -1))
+    layer = dropout(layer,p=0.5)
+
+    layer = DenseLayer(layer, nonlinearity=nonlinearity, num_units=128, name="dense")
+    layer = dropout(layer,p=0.5)
+    layer = DenseLayer(layer, nonlinearity=nonlinearities.softmax, num_units=n_output, name="dense_softmax")
+
+    net = NeuralNet(
+        layer,
+        update=adam,
+        update_learning_rate=0.001,
+        #update_momentum=0.9,
+        regression=False,
+        max_epochs=100,
+        verbose=1,
+        on_epoch_finished=[EarlyStopping(patience=10),],
+        batch_iterator_train = batch_iterator_train,
+        batch_iterator_test = batch_iterator_test,
+        train_split = train_split,
+    )
+    return net

@@ -346,14 +346,6 @@ def read_test_data(dataset,start,stop):
 
 	print "Done reading in", stop-start, "test snippets of 10min."
 
-def get_train_val_split(train_no,val_no,fold=1):
-	no = train_no + val_no
-	is_train_index = np.zeros(no, dtype=np.bool)
-	is_train_index[:train_no] = True
-	# val_no = no - train_no
-	# val_indices = all_indices[train_no:]
-	return is_train_index
-
 def normalize():
 	global maximum
 	global minimum
@@ -370,7 +362,7 @@ def normalize():
 	min1 = np.amin(g.ms_seizure)
 	min2 = np.amin(g.ms_normal)
 	min3 = np.amin(g.ms_xtra_seizure)
-	minimum = max([min1,min2,min3])
+	minimum = min([min1,min2,min3])
 
 	if cfg['preprocess']['normalization'] == 'div_max_x255':
 		print "Normalizing/maximum*255 ", maximum
@@ -404,6 +396,12 @@ def normalize():
 	# xVal = np.log(xVal)
 	# xTrain = (xTrain-mean)/stdev
 	# xVal = (xVal-mean)/stdev
+
+def shuffle_magnitudes():
+
+	np.random.shuffle(g.ms_normal)
+	np.random.shuffle(g.ms_seizure)
+	np.random.shuffle(g.ms_xtra_seizure)
 
 def preprocess():
 	global size
@@ -458,6 +456,8 @@ def preprocess():
 	print("Memory usage (GB): "+str(process.memory_info().rss/1e9))
 
 	normalize()
+
+	shuffle_magnitudes()
 
 	#Construct data vector
 	x = dict()
@@ -792,6 +792,9 @@ if args.no_preprocessing:
 	load_preprocessed()
 else:
 	preprocess()
+
+
+
 
 check_magnitudes()
 

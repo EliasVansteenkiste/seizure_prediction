@@ -7,10 +7,10 @@ import math
 from itertools import izip
 
 
-config_filename = 'config1.yml'
+config_filename = 'config2.yml'
 data_path = '/home/eavsteen/seizure_detection/data'
 target_gpu = 'gpu2'
-user = 'patient2'
+user = 'patient3'
 common_args = ['--debug-sub-ratio=1', '--config-filename='+config_filename, '--no-channels=1', '--target-gpu='+target_gpu, '--data-path='+data_path]
 
 
